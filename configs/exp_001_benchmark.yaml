@@ -1,0 +1,31 @@
+# EXP-001: RPB vs MRPB Comparative Benchmark
+# Frozen copy — do not edit after experiment starts.
+
+experiment:
+  name: "exp_001_benchmark"
+  description: "Comparative benchmark of RPB and MRPB across bit-lengths"
+  id: "EXP-001"
+
+seed: 42
+iterations: 1000  # per input pair
+
+rpb:
+  bound_exponent: 20000
+  c_range: [-50, 50]
+  precision_range: [1, 6]
+
+mrpb:
+  key_bits: 2048
+  precision: 3
+
+input_files:
+  - {name: "10bits",    file: "10bits.txt"}
+  - {name: "100bits",   file: "100bits.txt"}
+  - {name: "1000bits",  file: "1000bits.txt"}
+  - {name: "2000bits",  file: "2000bits.txt"}
+  - {name: "3000bits",  file: "3000bits.txt"}
+  - {name: "5000bits",  file: "5000bits.txt"}
+  - {name: "8000bits",  file: "8000bits.txt"}
+  - {name: "10000bits", file: "10000bits.txt"}
+
+output_dir: "experiments/exp_001_benchmark"

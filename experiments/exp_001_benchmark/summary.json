@@ -1,0 +1,338 @@
+{
+  "10bits": {
+    "rpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.00232434,
+      "enc_time_ms_std": 0.004553785190849476,
+      "enc_time_ms_median": 0.0016,
+      "dec_time_ms_mean": 0.00136821,
+      "dec_time_ms_std": 0.0014215394457770068,
+      "ct_size_bytes_mean": 39.5636,
+      "ct_size_bytes_std": 2.965291729324452
+    },
+    "rpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.00220054,
+      "enc_time_ms_std": 0.002792311893109364,
+      "enc_time_ms_median": 0.0015,
+      "dec_time_ms_mean": 0.00100174,
+      "dec_time_ms_std": 0.0009624141376767071,
+      "ct_size_bytes_mean": 23.9439,
+      "ct_size_bytes_std": 2.1036522502543047
+    },
+    "mrpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.0015339599999999998,
+      "enc_time_ms_std": 0.0030752939239038594,
+      "enc_time_ms_median": 0.0013,
+      "dec_time_ms_mean": 0.01201565,
+      "dec_time_ms_std": 0.008903121928711299,
+      "ct_size_bytes_mean": 511.9,
+      "ct_size_bytes_std": 0.3
+    },
+    "mrpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.0013910200000000002,
+      "enc_time_ms_std": 0.001748361907500847,
+      "enc_time_ms_median": 0.0011,
+      "dec_time_ms_mean": 0.011693109999999998,
+      "dec_time_ms_std": 0.0086555171727575,
+      "ct_size_bytes_mean": 512.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_key_bits_used": 2048,
+    "mrpb_keygen_time_s": 0.023663799999894763
+  },
+  "100bits": {
+    "rpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.0041990099999999995,
+      "enc_time_ms_std": 0.03696985144708996,
+      "enc_time_ms_median": 0.0032,
+      "dec_time_ms_mean": 0.004656919999999999,
+      "dec_time_ms_std": 0.00395009191204458,
+      "ct_size_bytes_mean": 338.8502,
+      "ct_size_bytes_std": 3.0034580003722375
+    },
+    "rpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.0024492900000000002,
+      "enc_time_ms_std": 0.0027194318332879755,
+      "enc_time_ms_median": 0.002,
+      "dec_time_ms_mean": 0.0036711799999999996,
+      "dec_time_ms_std": 0.005739525712774532,
+      "ct_size_bytes_mean": 173.4529,
+      "ct_size_bytes_std": 2.077686595711682
+    },
+    "mrpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.00591977,
+      "enc_time_ms_std": 0.00741995742218916,
+      "enc_time_ms_median": 0.0043,
+      "dec_time_ms_mean": 0.10355239000000001,
+      "dec_time_ms_std": 0.09172852605535478,
+      "ct_size_bytes_mean": 512.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.0028522799999999996,
+      "enc_time_ms_std": 0.0035416850229234107,
+      "enc_time_ms_median": 0.002,
+      "dec_time_ms_mean": 0.09609390000000001,
+      "dec_time_ms_std": 0.08657711725848811,
+      "ct_size_bytes_mean": 512.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_key_bits_used": 2048,
+    "mrpb_keygen_time_s": 0.02560019999987162
+  },
+  "1000bits": {
+    "rpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.04010176,
+      "enc_time_ms_std": 0.034088122314119916,
+      "enc_time_ms_median": 0.034,
+      "dec_time_ms_mean": 0.07681510000000001,
+      "dec_time_ms_std": 0.060230202456823936,
+      "ct_size_bytes_mean": 3328.0447,
+      "ct_size_bytes_std": 3.1039494051933256
+    },
+    "rpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.0118516,
+      "enc_time_ms_std": 0.010263316298351133,
+      "enc_time_ms_median": 0.0098,
+      "dec_time_ms_mean": 0.04401659,
+      "dec_time_ms_std": 0.037777692224008334,
+      "ct_size_bytes_mean": 1668.3893,
+      "ct_size_bytes_std": 2.075703618053406
+    },
+    "mrpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.08373912,
+      "enc_time_ms_std": 0.03481904909134654,
+      "enc_time_ms_median": 0.0791,
+      "dec_time_ms_mean": 2.29590951,
+      "dec_time_ms_std": 0.6781768296046098,
+      "ct_size_bytes_mean": 3392.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.0368145,
+      "enc_time_ms_std": 0.01302691297852258,
+      "enc_time_ms_median": 0.0347,
+      "dec_time_ms_mean": 2.1935940799999996,
+      "dec_time_ms_std": 0.6087173869711244,
+      "ct_size_bytes_mean": 3392.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_key_bits_used": 13568,
+    "mrpb_keygen_time_s": 13.413855499999954
+  },
+  "2000bits": {
+    "rpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.10733967999999999,
+      "enc_time_ms_std": 0.1071757001446578,
+      "enc_time_ms_median": 0.0833,
+      "dec_time_ms_mean": 0.24598384999999998,
+      "dec_time_ms_std": 0.19255883032511778,
+      "ct_size_bytes_mean": 6650.6862,
+      "ct_size_bytes_std": 3.0255461589603954
+    },
+    "rpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.02926782,
+      "enc_time_ms_std": 0.027812465666452516,
+      "enc_time_ms_median": 0.0229,
+      "dec_time_ms_mean": 0.11348481999999999,
+      "dec_time_ms_std": 0.09115089005362262,
+      "ct_size_bytes_mean": 3329.3173,
+      "ct_size_bytes_std": 2.1026223412681606
+    },
+    "mrpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.25174997000000005,
+      "enc_time_ms_std": 0.16705647979650207,
+      "enc_time_ms_median": 0.2073,
+      "dec_time_ms_mean": 7.7429299899999995,
+      "dec_time_ms_std": 3.184911419907561,
+      "ct_size_bytes_mean": 6720.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.11034704999999999,
+      "enc_time_ms_std": 0.0805843240667656,
+      "enc_time_ms_median": 0.0905,
+      "dec_time_ms_mean": 7.497920509999999,
+      "dec_time_ms_std": 3.086735890013971,
+      "ct_size_bytes_mean": 6720.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_key_bits_used": 26880,
+    "mrpb_keygen_time_s": 20.123806699999932
+  },
+  "3000bits": {
+    "rpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.14950336,
+      "enc_time_ms_std": 0.03175987419229491,
+      "enc_time_ms_median": 0.1475,
+      "dec_time_ms_mean": 0.38792949,
+      "dec_time_ms_std": 0.04137058940044123,
+      "ct_size_bytes_mean": 9971.7587,
+      "ct_size_bytes_std": 3.0602408908450327
+    },
+    "rpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.03959481,
+      "enc_time_ms_std": 0.011926917877804812,
+      "enc_time_ms_median": 0.0389,
+      "dec_time_ms_mean": 0.16371749,
+      "dec_time_ms_std": 0.02173803135290544,
+      "ct_size_bytes_mean": 4990.0779,
+      "ct_size_bytes_std": 2.0736517523441584
+    },
+    "mrpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.46383161,
+      "enc_time_ms_std": 0.28955213277371644,
+      "enc_time_ms_median": 0.3975,
+      "dec_time_ms_mean": 15.272644520000002,
+      "dec_time_ms_std": 6.058402334586898,
+      "ct_size_bytes_mean": 10048.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.21007428999999997,
+      "enc_time_ms_std": 0.14785379913954155,
+      "enc_time_ms_median": 0.1774,
+      "dec_time_ms_mean": 14.623397140000002,
+      "dec_time_ms_std": 5.798074277822234,
+      "ct_size_bytes_mean": 10048.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_key_bits_used": 40192,
+    "mrpb_keygen_time_s": 404.65578059999984
+  },
+  "5000bits": {
+    "rpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.38667349000000006,
+      "enc_time_ms_std": 0.2275144672547658,
+      "enc_time_ms_median": 0.3273,
+      "dec_time_ms_mean": 1.13099092,
+      "dec_time_ms_std": 0.5699542862489531,
+      "ct_size_bytes_mean": 16610.2913,
+      "ct_size_bytes_std": 0.9559520437762555
+    },
+    "rpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.10652621,
+      "enc_time_ms_std": 0.08008473779713524,
+      "enc_time_ms_median": 0.0896,
+      "dec_time_ms_mean": 0.45562604,
+      "dec_time_ms_std": 0.28261089289678554,
+      "ct_size_bytes_mean": 8312.1226,
+      "ct_size_bytes_std": 2.072189479753239
+    },
+    "mrpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 1.06546633,
+      "enc_time_ms_std": 0.646290325051622,
+      "enc_time_ms_median": 0.7832,
+      "dec_time_ms_mean": 42.47903145,
+      "dec_time_ms_std": 13.987218958524597,
+      "ct_size_bytes_mean": 16704.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.48171501,
+      "enc_time_ms_std": 0.36617379661261934,
+      "enc_time_ms_median": 0.3508,
+      "dec_time_ms_mean": 41.31119668,
+      "dec_time_ms_std": 13.748450101091287,
+      "ct_size_bytes_mean": 16704.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_key_bits_used": 66816,
+    "mrpb_keygen_time_s": 4864.7681672
+  },
+  "8000bits": {
+    "rpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.72694308,
+      "enc_time_ms_std": 0.5460119173224277,
+      "enc_time_ms_median": 0.4948,
+      "dec_time_ms_mean": 1.94515523,
+      "dec_time_ms_std": 1.2337204933844,
+      "ct_size_bytes_mean": 23254.2191,
+      "ct_size_bytes_std": 0.5953949865425473
+    },
+    "rpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.19593052,
+      "enc_time_ms_std": 0.16687554839019886,
+      "enc_time_ms_median": 0.1328,
+      "dec_time_ms_mean": 0.92803328,
+      "dec_time_ms_std": 0.653233225151968,
+      "ct_size_bytes_mean": 11634.0454,
+      "ct_size_bytes_std": 2.0831079760780526
+    },
+    "mrpb_shared": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 1.7102436,
+      "enc_time_ms_std": 1.0139266636650996,
+      "enc_time_ms_median": 1.2501,
+      "dec_time_ms_mean": 78.62082456,
+      "dec_time_ms_std": 23.15203317600769,
+      "ct_size_bytes_mean": 23360.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_distinct": {
+      "count": 10000,
+      "correctness": 1.0,
+      "enc_time_ms_mean": 0.77397973,
+      "enc_time_ms_std": 0.5131603648608563,
+      "enc_time_ms_median": 0.5653,
+      "dec_time_ms_mean": 76.8188951,
+      "dec_time_ms_std": 22.649596037002826,
+      "ct_size_bytes_mean": 23360.0,
+      "ct_size_bytes_std": 0.0
+    },
+    "mrpb_key_bits_used": 93440,
+    "mrpb_keygen_time_s": 17282.618746300002
+  }
+}
