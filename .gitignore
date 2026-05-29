@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment / secrets
+.env
+.env.local
+*.key
+*secrets*
+
+# Experiment outputs (large files)
+experiments/*/checkpoints/
+experiments/*/logs/
+*.ckpt
+*.pt
+*.pth
+
+# Data (track checksums, not raw data)
+data/raw/*.bin
+data/raw/*.dat
+data/processed/*.pkl
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_metadata
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Coverage
+.coverage
+htmlcov/

@@ -1,0 +1,51 @@
+# Base experiment configuration for HERPB benchmarks
+# All experiments inherit from this and override specific values.
+
+experiment:
+  name: "base"
+  description: "Default configuration for RPB/MRPB comparison"
+
+# Random seed for reproducibility
+seed: 42
+
+# Number of iterations per input pair
+iterations: 1000
+
+# RPB parameters
+rpb:
+  # Ciphertext size bound (as exponent of 10)
+  bound_exponent: 20000
+  # Range for random blinding factor c
+  c_range: [-50, 50]
+  # Range for random precision parameters P, Pa, Pb
+  precision_range: [1, 6]
+
+# MRPB parameters
+mrpb:
+  # RSA modulus bit length
+  key_bits: 2048
+  # Default precision parameter
+  default_precision: 3
+
+# Input data files (relative to data/raw/)
+input_files:
+  - name: "10bits"
+    file: "10bits.txt"
+  - name: "100bits"
+    file: "100bits.txt"
+  - name: "1000bits"
+    file: "1000bits.txt"
+  - name: "2000bits"
+    file: "2000bits.txt"
+  - name: "3000bits"
+    file: "3000bits.txt"
+  - name: "5000bits"
+    file: "5000bits.txt"
+  - name: "8000bits"
+    file: "8000bits.txt"
+  - name: "10000bits"
+    file: "10000bits.txt"
+
+# Output
+output_dir: "experiments"
+save_csv: true
