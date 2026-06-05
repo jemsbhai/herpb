@@ -1,0 +1,29 @@
+# EXP-003: MRPB Addition Failure Depth Characterization
+# Frozen copy — do not edit after experiment starts.
+
+experiment:
+  name: "exp_003_add_depth"
+  description: "Find the maximum MRPB addition depth as a function of operand size"
+  id: "EXP-003"
+
+seed: 42
+
+# Operand bit-sizes to sweep
+operand_bits: [2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+# Depths to test at each operand size
+depths: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+# Trials per (operand_bits, depth) combination
+trials: 50
+
+# MRPB key configurations to compare
+mrpb_keys:
+  - {key_bits: 1024, label: "1024-bit"}
+  - {key_bits: 2048, label: "2048-bit"}
+  - {key_bits: 4096, label: "4096-bit"}
+
+# Precision parameter
+precision: 0  # zero padding to isolate operand-size effect
+
+output_dir: "experiments/exp_003_add_depth"

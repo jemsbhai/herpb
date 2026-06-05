@@ -179,3 +179,53 @@ in lattice HE but deterministic and predictable.
 - Config: experiments/exp_002_depth/config.yaml
 - Raw data: experiments/exp_002_depth/results_raw.csv
 - Summary: experiments/exp_002_depth/summary.json
+
+
+---
+
+## EXP-003: MRPB Addition Failure Depth Characterization
+
+**Date:** 2026-05-29
+**Researcher:** Muntaser Syed
+**Type:** computational
+**Status:** planned
+
+### Hypothesis
+The maximum MRPB addition depth before rational reconstruction fails follows
+the relationship: max_depth ≈ plaintext_bits / operand_bits, where
+plaintext_bits ≈ key_bits/2. Specifically for a 2048-bit key (~1024-bit
+plaintext space):
+- 8-bit operands: max_depth ≈ 128
+- 32-bit operands: max_depth ≈ 32
+- 128-bit operands: max_depth ≈ 8
+- 512-bit operands: max_depth ≈ 2
+
+### Independent Variables
+- Operand bit-size: 2, 4, 8, 16, 32, 64, 128, 256, 512 bits
+- Depth: 1 through 512
+- Key size: 1024, 2048, 4096 bits
+
+### Dependent Variables
+- Correctness rate (% of trials where decrypt matches exact)
+- Decrypt-OK rate (% where rational reconstruction succeeds)
+- Maximum depth at 100% correctness
+
+### Control Conditions
+- 50 trials per (operand_bits, depth, key_bits) combo
+- Precision t=0 (isolates operand size effect)
+- Seed 42
+
+### Protocol
+1. For each key_bits: generate MRPB keys
+2. For each operand_bits × depth: run 50 trials of addition chains
+3. Early-stop if 0% decrypt_ok at a given depth
+4. Record max depth at 100% correctness
+5. Compare actual vs predicted max_depth
+
+### Results
+[Pending]
+
+### Artifacts
+- Script: scripts/run_add_depth.py
+- Config: configs/exp_003_add_depth.yaml
+- Results: experiments/exp_003_add_depth/

@@ -1,0 +1,1568 @@
+{
+  "1024bit_op2": {
+    "key_bits": 1024,
+    "operand_bits": 2,
+    "predicted_max_depth": 256,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00014800000000000002
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001542
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0035059999999999996
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0077659999999999995
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.015917999999999998
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.034624
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.066564
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.136178
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.271138
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.5391819999999999
+      }
+    }
+  },
+  "1024bit_op4": {
+    "key_bits": 1024,
+    "operand_bits": 4,
+    "predicted_max_depth": 128,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000132
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001336
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0035199999999999997
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008212
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.018146
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.03333
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.070732
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.13678800000000002
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.271888
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.54903
+      }
+    }
+  },
+  "1024bit_op8": {
+    "key_bits": 1024,
+    "operand_bits": 8,
+    "predicted_max_depth": 64,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000146
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001374
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003326
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00783
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.016198
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.032116
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.067096
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.13372
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.278912
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.5711160000000001
+      }
+    }
+  },
+  "1024bit_op16": {
+    "key_bits": 1024,
+    "operand_bits": 16,
+    "predicted_max_depth": 32,
+    "actual_max_100pct_depth": 32,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000126
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001468
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0036420000000000003
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.007688
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.01976
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.033352
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.06597800000000001
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.13678200000000001
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.279708
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.54911
+      }
+    }
+  },
+  "1024bit_op32": {
+    "key_bits": 1024,
+    "operand_bits": 32,
+    "predicted_max_depth": 16,
+    "actual_max_100pct_depth": 16,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000136
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001308
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003428
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.007888000000000001
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.015946000000000002
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.032959999999999996
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.066282
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.133908
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.2704
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.537406
+      }
+    }
+  },
+  "1024bit_op64": {
+    "key_bits": 1024,
+    "operand_bits": 64,
+    "predicted_max_depth": 8,
+    "actual_max_100pct_depth": 8,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000154
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001334
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.004144
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00779
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.016504
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.033472
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.06797
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.134546
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.27038
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.54288
+      }
+    }
+  },
+  "1024bit_op128": {
+    "key_bits": 1024,
+    "operand_bits": 128,
+    "predicted_max_depth": 4,
+    "actual_max_100pct_depth": 2,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00015800000000000002
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0014960000000000002
+      },
+      "4": {
+        "correctness": 0.92,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00377
+      },
+      "8": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008166
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.016204
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.03395
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.066676
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.132572
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.272006
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.541292
+      }
+    }
+  },
+  "1024bit_op256": {
+    "key_bits": 1024,
+    "operand_bits": 256,
+    "predicted_max_depth": 2,
+    "actual_max_100pct_depth": 1,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000128
+      },
+      "2": {
+        "correctness": 0.72,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001734
+      },
+      "4": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0033900000000000002
+      },
+      "8": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.007526000000000001
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.017284
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.033494
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.068842
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.133084
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.27809
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.540638
+      }
+    }
+  },
+  "1024bit_op512": {
+    "key_bits": 1024,
+    "operand_bits": 512,
+    "predicted_max_depth": 1,
+    "actual_max_100pct_depth": 0,
+    "by_depth": {
+      "1": {
+        "correctness": 0.44,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000156
+      },
+      "2": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.001486
+      },
+      "4": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0034820000000000003
+      },
+      "8": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008026
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.016718
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.034224000000000004
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.07341
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.140874
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.28766400000000003
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.551716
+      }
+    }
+  },
+  "2048bit_op2": {
+    "key_bits": 2048,
+    "operand_bits": 2,
+    "predicted_max_depth": 512,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000142
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003804
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008986
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.019972
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.045136
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.090428
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.184162
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.393868
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.8009480000000001
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.557172
+      }
+    }
+  },
+  "2048bit_op4": {
+    "key_bits": 2048,
+    "operand_bits": 4,
+    "predicted_max_depth": 256,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000136
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0038740000000000003
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.01275
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.021338
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.043884
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.09616
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.19969599999999998
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.37283
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.779718
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.58919
+      }
+    }
+  },
+  "2048bit_op8": {
+    "key_bits": 2048,
+    "operand_bits": 8,
+    "predicted_max_depth": 128,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000142
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003402
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00903
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.022128000000000002
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.046064
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.09443
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.189836
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.371242
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.738412
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.580858
+      }
+    }
+  },
+  "2048bit_op16": {
+    "key_bits": 2048,
+    "operand_bits": 16,
+    "predicted_max_depth": 64,
+    "actual_max_100pct_depth": 64,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000156
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0032640000000000004
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.009245999999999999
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.021956000000000003
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.046818
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.094278
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.19109
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.40335
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.790806
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.51983
+      }
+    }
+  },
+  "2048bit_op32": {
+    "key_bits": 2048,
+    "operand_bits": 32,
+    "predicted_max_depth": 32,
+    "actual_max_100pct_depth": 32,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000142
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003096
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008616
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.020386
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.04427
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.09124399999999999
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.19991599999999998
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.396588
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.756054
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.50243
+      }
+    }
+  },
+  "2048bit_op64": {
+    "key_bits": 2048,
+    "operand_bits": 64,
+    "predicted_max_depth": 16,
+    "actual_max_100pct_depth": 16,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000136
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003352
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.0088
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.02145
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.04645
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.09211399999999999
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.186176
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.38022
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.780426
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.600288
+      }
+    }
+  },
+  "2048bit_op128": {
+    "key_bits": 2048,
+    "operand_bits": 128,
+    "predicted_max_depth": 8,
+    "actual_max_100pct_depth": 8,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00015000000000000001
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003448
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.009885999999999999
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.022250000000000002
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.047704
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.098064
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.198608
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.38986600000000005
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.7806820000000001
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.54403
+      }
+    }
+  },
+  "2048bit_op256": {
+    "key_bits": 2048,
+    "operand_bits": 256,
+    "predicted_max_depth": 4,
+    "actual_max_100pct_depth": 2,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000152
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003912
+      },
+      "4": {
+        "correctness": 0.94,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.009401999999999999
+      },
+      "8": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.022124
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.044926
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.09681799999999999
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.18300799999999998
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.38110999999999995
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.8073480000000001
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.5754460000000001
+      }
+    }
+  },
+  "2048bit_op512": {
+    "key_bits": 2048,
+    "operand_bits": 512,
+    "predicted_max_depth": 2,
+    "actual_max_100pct_depth": 1,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00014000000000000001
+      },
+      "2": {
+        "correctness": 0.74,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.003438
+      },
+      "4": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.010038
+      },
+      "8": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.021907999999999997
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.044332
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.09025999999999999
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.18666799999999997
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.37085
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.748594
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.514102
+      }
+    }
+  },
+  "4096bit_op2": {
+    "key_bits": 4096,
+    "operand_bits": 2,
+    "predicted_max_depth": 1024,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00015000000000000001
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.009184
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.025310000000000003
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.055864000000000004
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.12712
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.261608
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.538694
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.0998080000000001
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.18754
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.3811919999999995
+      }
+    }
+  },
+  "4096bit_op4": {
+    "key_bits": 4096,
+    "operand_bits": 4,
+    "predicted_max_depth": 512,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000168
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00924
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.027978
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.056948
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.128628
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.26562
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.499372
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.047116
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.065682
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.3924
+      }
+    }
+  },
+  "4096bit_op8": {
+    "key_bits": 4096,
+    "operand_bits": 8,
+    "predicted_max_depth": 256,
+    "actual_max_100pct_depth": 512,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000164
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008848
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.027993999999999998
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.057436
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.1242
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.26323
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.539604
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.10479
+      },
+      "256": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.198476
+      },
+      "512": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.2270319999999995
+      }
+    }
+  },
+  "4096bit_op16": {
+    "key_bits": 4096,
+    "operand_bits": 16,
+    "predicted_max_depth": 128,
+    "actual_max_100pct_depth": 128,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00014800000000000002
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008876
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.025932
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.058798
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.128672
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.266998
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.539684
+      },
+      "128": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.07116
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.195582
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.341248
+      }
+    }
+  },
+  "4096bit_op32": {
+    "key_bits": 4096,
+    "operand_bits": 32,
+    "predicted_max_depth": 64,
+    "actual_max_100pct_depth": 64,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000142
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008842
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.025072
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.056580000000000005
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.126532
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.26645800000000003
+      },
+      "64": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.539606
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.09372
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.1712059999999997
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.31009
+      }
+    }
+  },
+  "4096bit_op64": {
+    "key_bits": 4096,
+    "operand_bits": 64,
+    "predicted_max_depth": 32,
+    "actual_max_100pct_depth": 32,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000142
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.00838
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.024538
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.05803
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.125666
+      },
+      "32": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.26585000000000003
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.53455
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.0328220000000001
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.029568
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.245052
+      }
+    }
+  },
+  "4096bit_op128": {
+    "key_bits": 4096,
+    "operand_bits": 128,
+    "predicted_max_depth": 16,
+    "actual_max_100pct_depth": 16,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000124
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008168
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.024886
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.056508
+      },
+      "16": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.124772
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.264314
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.507256
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.031224
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.116076
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.211650000000001
+      }
+    }
+  },
+  "4096bit_op256": {
+    "key_bits": 4096,
+    "operand_bits": 256,
+    "predicted_max_depth": 8,
+    "actual_max_100pct_depth": 8,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000222
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.008846
+      },
+      "4": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.026347999999999996
+      },
+      "8": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.061062000000000005
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.129114
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.29713999999999996
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.5307200000000001
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.071686
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.1031020000000002
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.278642
+      }
+    }
+  },
+  "4096bit_op512": {
+    "key_bits": 4096,
+    "operand_bits": 512,
+    "predicted_max_depth": 4,
+    "actual_max_100pct_depth": 2,
+    "by_depth": {
+      "1": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.000196
+      },
+      "2": {
+        "correctness": 1.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.009242
+      },
+      "4": {
+        "correctness": 0.94,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.026680000000000002
+      },
+      "8": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.058852
+      },
+      "16": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.129534
+      },
+      "32": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.260436
+      },
+      "64": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 0.5241
+      },
+      "128": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 1.045234
+      },
+      "256": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 2.088
+      },
+      "512": {
+        "correctness": 0.0,
+        "decrypt_ok_rate": 1.0,
+        "eval_time_ms_mean": 4.213570000000001
+      }
+    }
+  }
+}

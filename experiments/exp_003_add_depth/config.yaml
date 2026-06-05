@@ -1,0 +1,36 @@
+depths:
+- 1
+- 2
+- 4
+- 8
+- 16
+- 32
+- 64
+- 128
+- 256
+- 512
+experiment:
+  description: Find the maximum MRPB addition depth as a function of operand size
+  id: EXP-003
+  name: exp_003_add_depth
+mrpb_keys:
+- key_bits: 1024
+  label: 1024-bit
+- key_bits: 2048
+  label: 2048-bit
+- key_bits: 4096
+  label: 4096-bit
+operand_bits:
+- 2
+- 4
+- 8
+- 16
+- 32
+- 64
+- 128
+- 256
+- 512
+output_dir: experiments/exp_003_add_depth
+precision: 0
+seed: 42
+trials: 50
