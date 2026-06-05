@@ -5,8 +5,9 @@ Validates:
 2. Correctness: decrypt(encrypt(a, b), sk) == a/b
 3. Semantic security: ciphertexts look random without sk
 4. Homomorphic multiplication
-5. Fixed ciphertext size
-6. Rational reconstruction from modular residues
+5. Homomorphic addition and subtraction
+6. Fixed ciphertext size
+7. Plaintext space bounds
 """
 
 import pytest
@@ -20,8 +21,12 @@ from src.herpb.schemes.mrpb import (
     decrypt,
     eval_multiply,
     eval_add,
+    eval_subtract,
+    plaintext_bits,
+    check_plaintext_fits,
     MRPBCiphertext,
 )
+from src.herpb.utils.math_utils import reduce_fraction
 
 
 class TestMRPBKeygen:
@@ -118,14 +123,10 @@ class TestMRPBSecurity:
             t=3, sk=sk,
         )
 
-        # GCD of N and D mod n should NOT give the ratio
         g = gmpy2.gcd(ct.N, ct.D)
         reduced_n = ct.N // g
         reduced_d = ct.D // g
 
-        # If the scheme is secure, this should NOT equal 5/6
-        # (it could by coincidence with very small probability, but
-        # for our test keys it should not)
         is_leaked = (reduced_n == s["expected_num"] and reduced_d == s["expected_den"])
         assert not is_leaked, "GCD reduction leaked the plaintext ratio!"
 
@@ -155,27 +156,25 @@ class TestMRPBSecurity:
         assert ct.D < pk.n, "D should be < n"
 
 
-class TestMRPBHomomorphic:
-    """Tests for homomorphic operations."""
+class TestMRPBHomomorphicMultiply:
+    """Tests for homomorphic multiplication."""
 
     def test_multiply(self, mrpb_keys):
         """Homomorphic multiplication of two encrypted ratios."""
         _, sk = mrpb_keys
 
-        # Ratio 1: (2/3)/(4/5) = 5/6
         ct1 = encrypt_shared(mpz(2), mpz(3), mpz(4), mpz(5), t=2, sk=sk)
-        # Ratio 2: (1/2)/(1/3) = 3/2
         ct2 = encrypt_shared(mpz(1), mpz(2), mpz(1), mpz(3), t=2, sk=sk)
 
         ct_prod = eval_multiply(ct1, ct2)
         num, den = decrypt(ct_prod, sk)
 
-        # Expected: (5/6) * (3/2) = 15/12 = 5/4
+        # (5/6) * (3/2) = 15/12 = 5/4
         assert num == mpz(5), f"Expected 5, got {num}"
         assert den == mpz(4), f"Expected 4, got {den}"
 
     def test_multiply_fixed_size(self, mrpb_keys):
-        """Ciphertext size should NOT grow after multiplication (unlike RPB)."""
+        """Ciphertext size should NOT grow after multiplication."""
         pk, sk = mrpb_keys
 
         ct1 = encrypt_shared(mpz(2), mpz(3), mpz(4), mpz(5), t=2, sk=sk)
@@ -183,7 +182,6 @@ class TestMRPBHomomorphic:
 
         ct_prod = eval_multiply(ct1, ct2)
 
-        # After multiplication, still bounded by n
         assert ct_prod.N < pk.n
         assert ct_prod.D < pk.n
 
@@ -198,8 +196,141 @@ class TestMRPBHomomorphic:
         result = eval_multiply(eval_multiply(ct1, ct2), ct3)
         num, den = decrypt(result, sk)
 
-        # Expected: (3/2)*(14/5)*(27/8) = 1134/80 = 567/40
-        from src.herpb.utils.math_utils import reduce_fraction
+        # (3/2)*(14/5)*(27/8) = 1134/80 = 567/40
         exp_n, exp_d = reduce_fraction(mpz(3 * 14 * 27), mpz(2 * 5 * 8))
         assert num == exp_n, f"Expected {exp_n}, got {num}"
         assert den == exp_d, f"Expected {exp_d}, got {den}"
+
+
+class TestMRPBHomomorphicAdd:
+    """Tests for homomorphic addition and subtraction."""
+
+    def test_add_simple(self, mrpb_keys):
+        """(5/6) + (3/2) = 5/6 + 9/6 = 14/6 = 7/3."""
+        _, sk = mrpb_keys
+
+        # ratio 1: (2/3)/(4/5) = 5/6
+        ct1 = encrypt_shared(mpz(2), mpz(3), mpz(4), mpz(5), t=2, sk=sk)
+        # ratio 2: (1/2)/(1/3) = 3/2
+        ct2 = encrypt_shared(mpz(1), mpz(2), mpz(1), mpz(3), t=2, sk=sk)
+
+        ct_sum = eval_add(ct1, ct2)
+        num, den = decrypt(ct_sum, sk)
+
+        # 5/6 + 3/2 = 5/6 + 9/6 = 14/6 = 7/3
+        exp_n, exp_d = reduce_fraction(mpz(5 * 2 + 3 * 6), mpz(6 * 2))
+        assert num == exp_n, f"Expected {exp_n}/{exp_d}, got {num}/{den}"
+        assert den == exp_d
+
+    def test_add_different_k_values(self, mrpb_keys):
+        """Addition works even when ciphertexts used different k (different LCMs)."""
+        _, sk = mrpb_keys
+
+        # ratio 1: (7/11)/(3/13) = 91/33, LCM(11,13) = 143
+        ct1 = encrypt_shared(mpz(7), mpz(11), mpz(3), mpz(13), t=2, sk=sk)
+        # ratio 2: (1/2)/(1/5) = 5/2, LCM(2,5) = 10
+        ct2 = encrypt_shared(mpz(1), mpz(2), mpz(1), mpz(5), t=2, sk=sk)
+
+        ct_sum = eval_add(ct1, ct2)
+        num, den = decrypt(ct_sum, sk)
+
+        # 91/33 + 5/2 = (91*2 + 5*33)/(33*2) = (182 + 165)/66 = 347/66
+        exp_n, exp_d = reduce_fraction(mpz(347), mpz(66))
+        assert num == exp_n, f"Expected {exp_n}/{exp_d}, got {num}/{den}"
+        assert den == exp_d
+
+    def test_subtract_simple(self, mrpb_keys):
+        """(3/2) - (5/6) = 9/6 - 5/6 = 4/6 = 2/3."""
+        _, sk = mrpb_keys
+
+        ct1 = encrypt_shared(mpz(1), mpz(2), mpz(1), mpz(3), t=2, sk=sk)  # 3/2
+        ct2 = encrypt_shared(mpz(2), mpz(3), mpz(4), mpz(5), t=2, sk=sk)  # 5/6
+
+        ct_diff = eval_subtract(ct1, ct2)
+        num, den = decrypt(ct_diff, sk)
+
+        # 3/2 - 5/6 = 9/6 - 5/6 = 4/6 = 2/3
+        exp_n, exp_d = reduce_fraction(mpz(3 * 6 - 5 * 2), mpz(2 * 6))
+        assert num == exp_n, f"Expected {exp_n}/{exp_d}, got {num}/{den}"
+        assert den == exp_d
+
+    def test_add_then_multiply(self, mrpb_keys):
+        """Mixed circuit: (a + b) * c."""
+        _, sk = mrpb_keys
+
+        ct_a = encrypt_shared(mpz(1), mpz(1), mpz(3), mpz(1), t=2, sk=sk)  # 1/3
+        ct_b = encrypt_shared(mpz(1), mpz(1), mpz(6), mpz(1), t=2, sk=sk)  # 1/6
+        ct_c = encrypt_shared(mpz(3), mpz(1), mpz(1), mpz(1), t=2, sk=sk)  # 3/1
+
+        ct_sum = eval_add(ct_a, ct_b)   # 1/3 + 1/6 = 1/2
+        ct_result = eval_multiply(ct_sum, ct_c)  # 1/2 * 3 = 3/2
+        num, den = decrypt(ct_result, sk)
+
+        assert num == mpz(3), f"Expected 3/2, got {num}/{den}"
+        assert den == mpz(2)
+
+    def test_multiply_then_add(self, mrpb_keys):
+        """Mixed circuit: (a * b) + c."""
+        _, sk = mrpb_keys
+
+        ct_a = encrypt_shared(mpz(1), mpz(2), mpz(1), mpz(3), t=2, sk=sk)  # 3/2
+        ct_b = encrypt_shared(mpz(2), mpz(3), mpz(4), mpz(5), t=2, sk=sk)  # 5/6
+        ct_c = encrypt_shared(mpz(1), mpz(1), mpz(4), mpz(1), t=2, sk=sk)  # 1/4
+
+        ct_prod = eval_multiply(ct_a, ct_b)  # 3/2 * 5/6 = 5/4
+        ct_result = eval_add(ct_prod, ct_c)   # 5/4 + 1/4 = 6/4 = 3/2
+        num, den = decrypt(ct_result, sk)
+
+        assert num == mpz(3), f"Expected 3/2, got {num}/{den}"
+        assert den == mpz(2)
+
+    def test_chained_add_depth_4(self, mrpb_keys):
+        """Four additions: 1/2 + 1/3 + 1/4 + 1/5."""
+        _, sk = mrpb_keys
+
+        cts = [
+            encrypt_shared(mpz(1), mpz(1), mpz(d), mpz(1), t=2, sk=sk)
+            for d in [2, 3, 4, 5]
+        ]
+
+        result = cts[0]
+        for ct in cts[1:]:
+            result = eval_add(result, ct)
+
+        num, den = decrypt(result, sk)
+
+        # 1/2 + 1/3 + 1/4 + 1/5 = 30/60 + 20/60 + 15/60 + 12/60 = 77/60
+        exp_n, exp_d = reduce_fraction(mpz(77), mpz(60))
+        assert num == exp_n, f"Expected {exp_n}/{exp_d}, got {num}/{den}"
+        assert den == exp_d
+
+    def test_add_ciphertext_size_stays_fixed(self, mrpb_keys):
+        """After addition, ciphertext is still < n."""
+        pk, sk = mrpb_keys
+
+        ct1 = encrypt_shared(mpz(2), mpz(3), mpz(4), mpz(5), t=2, sk=sk)
+        ct2 = encrypt_shared(mpz(1), mpz(2), mpz(1), mpz(3), t=2, sk=sk)
+
+        ct_sum = eval_add(ct1, ct2)
+
+        assert ct_sum.N < pk.n
+        assert ct_sum.D < pk.n
+
+
+class TestMRPBPlaintextSpace:
+    """Tests for plaintext space utilities."""
+
+    def test_plaintext_bits(self, mrpb_keys):
+        _, sk = mrpb_keys
+        pb = plaintext_bits(sk)
+        # 1024-bit key -> sqrt(n) ~ 512 bits
+        assert 400 < pb < 600, f"Expected ~512 bits, got {pb}"
+
+    def test_small_ratio_fits(self, mrpb_keys):
+        _, sk = mrpb_keys
+        assert check_plaintext_fits(mpz(7), mpz(3), sk)
+
+    def test_huge_ratio_does_not_fit(self, mrpb_keys):
+        _, sk = mrpb_keys
+        huge = mpz(2) ** 1000
+        assert not check_plaintext_fits(huge, mpz(1), sk)

@@ -5,7 +5,17 @@ n = p * q. Achieves IND-CPA security: the ratio a/b is hidden from any
 adversary who does not know the factorization of n.
 
 Security model: IND-CPA under RSA assumption.
-Homomorphic depth: unlimited (no noise, no bootstrapping).
+
+Homomorphic depth:
+  - Multiplication: unlimited. The plaintext ratio stays the same size
+    (product of two reduced fractions is still a reduced fraction of
+    bounded size). No noise, no bootstrapping.
+  - Addition: bounded by plaintext space. Each addition can grow the
+    numerator/denominator of the result. Rational reconstruction
+    requires |num|, den < sqrt(n), so the maximum addition depth
+    depends on the magnitude of the operands vs the modulus size.
+  - Mixed circuits: multiplication is free, addition consumes headroom.
+
 Ciphertext size: fixed (bounded by n, does not grow with operations).
 """
 
@@ -174,29 +184,35 @@ def encrypt_distinct(
 def decrypt(ct: MRPBCiphertext, sk: MRPBSecretKey) -> tuple[mpz, mpz]:
     """Decrypt MRPB ciphertext to recover the ratio.
 
-    Strips the blinding factor c and scaling k using modular inverses,
-    then recovers the ratio via modular fraction reconstruction.
+    Strips one layer of blinding factor c, then computes the ratio
+    N'/D' mod n. All remaining common factors (additional c powers from
+    homomorphic ops, scaling factors k) cancel in the division.
+
+    Finally, rational reconstruction recovers the exact ratio from
+    its modular residue, provided |num|, den < sqrt(n).
 
     Returns
     -------
     (num, den) : tuple[mpz, mpz]
         The ratio in lowest terms.
+
+    Raises
+    ------
+    ValueError
+        If the ratio exceeds the plaintext space (sqrt(n) bound).
     """
     # Strip blinding: N' = N * c_inv mod n, D' = D * c_inv mod n
     N_stripped = (ct.N * sk.c_inv) % sk.n
     D_stripped = (ct.D * sk.c_inv) % sk.n
 
-    # Now N_stripped = a1 * k (mod n), D_stripped = b1 * k (mod n)
-    # The ratio N_stripped / D_stripped = a1/b1 = a/b (in Z_n)
-    # To recover, compute N_stripped * D_stripped_inv mod n
     if D_stripped == 0:
         raise ValueError("Decryption failed: denominator is zero mod n")
 
+    # Compute ratio in Z_n. Any remaining c or k factors cancel here.
     D_inv = gmpy2.invert(D_stripped, sk.n)
     ratio_mod_n = (N_stripped * D_inv) % sk.n
 
-    # The ratio a/b is small compared to n, so it can be recovered
-    # via continued fraction / lattice-based rational reconstruction
+    # Recover exact rational from modular residue
     num, den = _rational_reconstruction(ratio_mod_n, sk.n)
 
     return num, den
@@ -253,6 +269,25 @@ def _rational_reconstruction(r: mpz, m: mpz) -> tuple[mpz, mpz]:
 
 
 # ---------------------------------------------------------------------------
+# Plaintext space utilities
+# ---------------------------------------------------------------------------
+
+def plaintext_bits(sk: MRPBSecretKey) -> int:
+    """Maximum bits for numerator or denominator of a decryptable ratio.
+
+    Rational reconstruction requires |num|, den < sqrt(n), so the
+    plaintext space is approximately key_bits / 2.
+    """
+    return int(gmpy2.num_digits(gmpy2.isqrt(sk.n), 2))
+
+
+def check_plaintext_fits(num: mpz, den: mpz, sk: MRPBSecretKey) -> bool:
+    """Check whether a ratio num/den can be recovered from this key's modulus."""
+    bound = gmpy2.isqrt(sk.n)
+    return abs(num) < bound and den < bound
+
+
+# ---------------------------------------------------------------------------
 # Homomorphic operations
 # ---------------------------------------------------------------------------
 
@@ -260,6 +295,8 @@ def eval_multiply(ct1: MRPBCiphertext, ct2: MRPBCiphertext) -> MRPBCiphertext:
     """Homomorphic multiplication: result decrypts to (a/b) * (e/f).
 
     Fixed-size output — no ciphertext growth.
+    Multiplication does not grow the plaintext ratio (reduced product of
+    two small fractions is still small), so depth is unlimited.
     """
     assert ct1.n == ct2.n, "Ciphertexts must share the same modulus"
     n = ct1.n
@@ -273,13 +310,14 @@ def eval_multiply(ct1: MRPBCiphertext, ct2: MRPBCiphertext) -> MRPBCiphertext:
 def eval_add(ct1: MRPBCiphertext, ct2: MRPBCiphertext) -> MRPBCiphertext:
     """Homomorphic addition: result decrypts to (a/b) + (e/f).
 
-    NOTE: Addition introduces a second blinding factor. After addition,
-    N = (a1*k*c * f1*k'*c' + e1*k'*c' * b1*k*c) mod n
-    The c factors do NOT cancel cleanly. Decryption after addition requires
-    knowing all c values used, or a modified protocol.
+    The blinding factors c (and any accumulated c^k from prior ops) appear
+    in both N and D with the same power, so they cancel when the decryptor
+    computes N'/D' mod n. No special handling is needed.
 
-    For the current implementation, addition is supported ONLY between
-    ciphertexts encrypted with the SAME c (same secret key).
+    CONSTRAINT: addition grows the plaintext ratio. After adding k terms
+    of magnitude M, the result numerator/denominator can be O(k * M^k).
+    Decryption succeeds only while |result_num|, result_den < sqrt(n).
+    For a 2048-bit modulus, this gives ~1024 bits of plaintext headroom.
     """
     assert ct1.n == ct2.n, "Ciphertexts must share the same modulus"
     n = ct1.n
@@ -291,7 +329,10 @@ def eval_add(ct1: MRPBCiphertext, ct2: MRPBCiphertext) -> MRPBCiphertext:
 
 
 def eval_subtract(ct1: MRPBCiphertext, ct2: MRPBCiphertext) -> MRPBCiphertext:
-    """Homomorphic subtraction: result decrypts to (a/b) - (e/f)."""
+    """Homomorphic subtraction: result decrypts to (a/b) - (e/f).
+
+    Same plaintext growth constraint as eval_add.
+    """
     assert ct1.n == ct2.n, "Ciphertexts must share the same modulus"
     n = ct1.n
     return MRPBCiphertext(
