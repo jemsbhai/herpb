@@ -1,0 +1,241 @@
+scheme,security,model,n_docs,dimension,query_idx,top_k,recall_at_k,query_ms,setup_time_s
+plaintext,none,none,50,384,0,1,1.0,0.7036000024527311,0
+plaintext,none,none,50,384,0,5,1.0,0.7036000024527311,0
+plaintext,none,none,50,384,0,10,1.0,0.7036000024527311,0
+plaintext,none,none,50,384,1,1,1.0,0.6694999756291509,0
+plaintext,none,none,50,384,1,5,1.0,0.6694999756291509,0
+plaintext,none,none,50,384,1,10,1.0,0.6694999756291509,0
+plaintext,none,none,50,384,2,1,1.0,0.7464999798685312,0
+plaintext,none,none,50,384,2,5,1.0,0.7464999798685312,0
+plaintext,none,none,50,384,2,10,1.0,0.7464999798685312,0
+plaintext,none,none,50,384,3,1,1.0,0.721300020813942,0
+plaintext,none,none,50,384,3,5,1.0,0.721300020813942,0
+plaintext,none,none,50,384,3,10,1.0,0.721300020813942,0
+plaintext,none,none,50,384,4,1,1.0,0.8762999204918742,0
+plaintext,none,none,50,384,4,5,1.0,0.8762999204918742,0
+plaintext,none,none,50,384,4,10,1.0,0.8762999204918742,0
+plaintext,none,none,50,384,5,1,1.0,0.7389000384137034,0
+plaintext,none,none,50,384,5,5,1.0,0.7389000384137034,0
+plaintext,none,none,50,384,5,10,1.0,0.7389000384137034,0
+plaintext,none,none,50,384,6,1,1.0,0.7130000740289688,0
+plaintext,none,none,50,384,6,5,1.0,0.7130000740289688,0
+plaintext,none,none,50,384,6,10,1.0,0.7130000740289688,0
+plaintext,none,none,50,384,7,1,1.0,0.7985999109223485,0
+plaintext,none,none,50,384,7,5,1.0,0.7985999109223485,0
+plaintext,none,none,50,384,7,10,1.0,0.7985999109223485,0
+plaintext,none,none,50,384,8,1,1.0,0.9925999911502004,0
+plaintext,none,none,50,384,8,5,1.0,0.9925999911502004,0
+plaintext,none,none,50,384,8,10,1.0,0.9925999911502004,0
+plaintext,none,none,50,384,9,1,1.0,0.9989000391215086,0
+plaintext,none,none,50,384,9,5,1.0,0.9989000391215086,0
+plaintext,none,none,50,384,9,10,1.0,0.9989000391215086,0
+two_server_qp,info-theoretic,query_private,50,384,0,1,1.0,6.0526999877765775,0
+two_server_qp,info-theoretic,query_private,50,384,0,5,1.0,6.0526999877765775,0
+two_server_qp,info-theoretic,query_private,50,384,0,10,1.0,6.0526999877765775,0
+two_server_qp,info-theoretic,query_private,50,384,1,1,1.0,6.6114000510424376,0
+two_server_qp,info-theoretic,query_private,50,384,1,5,1.0,6.6114000510424376,0
+two_server_qp,info-theoretic,query_private,50,384,1,10,1.0,6.6114000510424376,0
+two_server_qp,info-theoretic,query_private,50,384,2,1,1.0,6.347499904222786,0
+two_server_qp,info-theoretic,query_private,50,384,2,5,1.0,6.347499904222786,0
+two_server_qp,info-theoretic,query_private,50,384,2,10,1.0,6.347499904222786,0
+two_server_qp,info-theoretic,query_private,50,384,3,1,1.0,6.753999972715974,0
+two_server_qp,info-theoretic,query_private,50,384,3,5,1.0,6.753999972715974,0
+two_server_qp,info-theoretic,query_private,50,384,3,10,1.0,6.753999972715974,0
+two_server_qp,info-theoretic,query_private,50,384,4,1,1.0,6.288899923674762,0
+two_server_qp,info-theoretic,query_private,50,384,4,5,1.0,6.288899923674762,0
+two_server_qp,info-theoretic,query_private,50,384,4,10,1.0,6.288899923674762,0
+two_server_qp,info-theoretic,query_private,50,384,5,1,1.0,6.455800030380487,0
+two_server_qp,info-theoretic,query_private,50,384,5,5,1.0,6.455800030380487,0
+two_server_qp,info-theoretic,query_private,50,384,5,10,1.0,6.455800030380487,0
+two_server_qp,info-theoretic,query_private,50,384,6,1,1.0,10.380399995483458,0
+two_server_qp,info-theoretic,query_private,50,384,6,5,1.0,10.380399995483458,0
+two_server_qp,info-theoretic,query_private,50,384,6,10,1.0,10.380399995483458,0
+two_server_qp,info-theoretic,query_private,50,384,7,1,1.0,8.091400028206408,0
+two_server_qp,info-theoretic,query_private,50,384,7,5,1.0,8.091400028206408,0
+two_server_qp,info-theoretic,query_private,50,384,7,10,1.0,8.091400028206408,0
+two_server_qp,info-theoretic,query_private,50,384,8,1,1.0,6.002500071190298,0
+two_server_qp,info-theoretic,query_private,50,384,8,5,1.0,6.002500071190298,0
+two_server_qp,info-theoretic,query_private,50,384,8,10,1.0,6.002500071190298,0
+two_server_qp,info-theoretic,query_private,50,384,9,1,1.0,6.456500035710633,0
+two_server_qp,info-theoretic,query_private,50,384,9,5,1.0,6.456500035710633,0
+two_server_qp,info-theoretic,query_private,50,384,9,10,1.0,6.456500035710633,0
+two_server_mp,info-theoretic,mutual_privacy,50,384,0,1,1.0,86.36089996434748,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,0,5,1.0,86.36089996434748,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,0,10,1.0,86.36089996434748,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,1,1,1.0,87.29749999474734,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,1,5,1.0,87.29749999474734,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,1,10,1.0,87.29749999474734,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,2,1,1.0,86.84359991457313,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,2,5,1.0,86.84359991457313,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,2,10,1.0,86.84359991457313,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,3,1,1.0,87.24899997469038,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,3,5,1.0,87.24899997469038,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,3,10,1.0,87.24899997469038,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,4,1,1.0,87.01510005630553,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,4,5,1.0,87.01510005630553,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,4,10,1.0,87.01510005630553,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,5,1,1.0,87.15439995285124,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,5,5,1.0,87.15439995285124,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,5,10,1.0,87.15439995285124,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,6,1,1.0,88.79329997580498,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,6,5,1.0,88.79329997580498,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,6,10,1.0,88.79329997580498,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,7,1,1.0,89.0586000168696,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,7,5,1.0,89.0586000168696,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,7,10,1.0,89.0586000168696,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,8,1,1.0,87.73819997441024,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,8,5,1.0,87.73819997441024,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,8,10,1.0,87.73819997441024,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,9,1,1.0,87.30070001911372,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,9,5,1.0,87.30070001911372,0.098733099992387
+two_server_mp,info-theoretic,mutual_privacy,50,384,9,10,1.0,87.30070001911372,0.098733099992387
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,0,1,1.0,855.7665999978781,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,0,5,1.0,855.7665999978781,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,0,10,1.0,855.7665999978781,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,1,1,1.0,870.2074000611901,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,1,5,1.0,870.2074000611901,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,1,10,1.0,870.2074000611901,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,2,1,1.0,868.5303000966087,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,2,5,1.0,868.5303000966087,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,2,10,1.0,868.5303000966087,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,3,1,1.0,853.7168999901041,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,3,5,1.0,853.7168999901041,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,3,10,1.0,853.7168999901041,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,4,1,1.0,898.8412000471726,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,4,5,1.0,898.8412000471726,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,4,10,1.0,898.8412000471726,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,5,1,1.0,892.8577000042424,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,5,5,1.0,892.8577000042424,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,5,10,1.0,892.8577000042424,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,6,1,1.0,874.7860000003129,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,6,5,1.0,874.7860000003129,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,6,10,1.0,874.7860000003129,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,7,1,1.0,870.0007000006735,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,7,5,1.0,870.0007000006735,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,7,10,1.0,870.0007000006735,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,8,1,1.0,882.7329999767244,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,8,5,1.0,882.7329999767244,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,8,10,1.0,882.7329999767244,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,9,1,1.0,881.7526999628171,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,9,5,1.0,881.7526999628171,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,50,384,9,10,1.0,881.7526999628171,0
+paillier,semantic (DCRA),query_private,50,384,0,1,1.0,7268.77829991281,0
+paillier,semantic (DCRA),query_private,50,384,0,5,1.0,7268.77829991281,0
+paillier,semantic (DCRA),query_private,50,384,0,10,1.0,7268.77829991281,0
+paillier,semantic (DCRA),query_private,50,384,1,1,1.0,9290.277500054799,0
+paillier,semantic (DCRA),query_private,50,384,1,5,1.0,9290.277500054799,0
+paillier,semantic (DCRA),query_private,50,384,1,10,1.0,9290.277500054799,0
+paillier,semantic (DCRA),query_private,50,384,2,1,1.0,7730.263800011016,0
+paillier,semantic (DCRA),query_private,50,384,2,5,1.0,7730.263800011016,0
+paillier,semantic (DCRA),query_private,50,384,2,10,1.0,7730.263800011016,0
+paillier,semantic (DCRA),query_private,50,384,3,1,1.0,7098.630900029093,0
+paillier,semantic (DCRA),query_private,50,384,3,5,1.0,7098.630900029093,0
+paillier,semantic (DCRA),query_private,50,384,3,10,1.0,7098.630900029093,0
+paillier,semantic (DCRA),query_private,50,384,4,1,1.0,7093.2904999936,0
+paillier,semantic (DCRA),query_private,50,384,4,5,1.0,7093.2904999936,0
+paillier,semantic (DCRA),query_private,50,384,4,10,1.0,7093.2904999936,0
+paillier,semantic (DCRA),query_private,50,384,5,1,1.0,7146.799499983899,0
+paillier,semantic (DCRA),query_private,50,384,5,5,1.0,7146.799499983899,0
+paillier,semantic (DCRA),query_private,50,384,5,10,1.0,7146.799499983899,0
+paillier,semantic (DCRA),query_private,50,384,6,1,1.0,7264.818000025116,0
+paillier,semantic (DCRA),query_private,50,384,6,5,1.0,7264.818000025116,0
+paillier,semantic (DCRA),query_private,50,384,6,10,1.0,7264.818000025116,0
+paillier,semantic (DCRA),query_private,50,384,7,1,1.0,7156.1673999531195,0
+paillier,semantic (DCRA),query_private,50,384,7,5,1.0,7156.1673999531195,0
+paillier,semantic (DCRA),query_private,50,384,7,10,1.0,7156.1673999531195,0
+paillier,semantic (DCRA),query_private,50,384,8,1,1.0,7163.924499996938,0
+paillier,semantic (DCRA),query_private,50,384,8,5,1.0,7163.924499996938,0
+paillier,semantic (DCRA),query_private,50,384,8,10,1.0,7163.924499996938,0
+paillier,semantic (DCRA),query_private,50,384,9,1,1.0,7443.277999991551,0
+paillier,semantic (DCRA),query_private,50,384,9,5,1.0,7443.277999991551,0
+paillier,semantic (DCRA),query_private,50,384,9,10,1.0,7443.277999991551,0
+plaintext,none,none,200,384,0,1,1.0,3.078700043261051,0
+plaintext,none,none,200,384,0,5,1.0,3.078700043261051,0
+plaintext,none,none,200,384,0,10,1.0,3.078700043261051,0
+plaintext,none,none,200,384,1,1,1.0,2.9903999529778957,0
+plaintext,none,none,200,384,1,5,1.0,2.9903999529778957,0
+plaintext,none,none,200,384,1,10,1.0,2.9903999529778957,0
+plaintext,none,none,200,384,2,1,1.0,3.071799990721047,0
+plaintext,none,none,200,384,2,5,1.0,3.071799990721047,0
+plaintext,none,none,200,384,2,10,1.0,3.071799990721047,0
+plaintext,none,none,200,384,3,1,1.0,3.117099986411631,0
+plaintext,none,none,200,384,3,5,1.0,3.117099986411631,0
+plaintext,none,none,200,384,3,10,1.0,3.117099986411631,0
+plaintext,none,none,200,384,4,1,1.0,3.098500077612698,0
+plaintext,none,none,200,384,4,5,1.0,3.098500077612698,0
+plaintext,none,none,200,384,4,10,1.0,3.098500077612698,0
+plaintext,none,none,200,384,5,1,1.0,3.2091999892145395,0
+plaintext,none,none,200,384,5,5,1.0,3.2091999892145395,0
+plaintext,none,none,200,384,5,10,1.0,3.2091999892145395,0
+plaintext,none,none,200,384,6,1,1.0,3.1649000011384487,0
+plaintext,none,none,200,384,6,5,1.0,3.1649000011384487,0
+plaintext,none,none,200,384,6,10,1.0,3.1649000011384487,0
+plaintext,none,none,200,384,7,1,1.0,3.2266000052914023,0
+plaintext,none,none,200,384,7,5,1.0,3.2266000052914023,0
+plaintext,none,none,200,384,7,10,1.0,3.2266000052914023,0
+plaintext,none,none,200,384,8,1,1.0,3.127699950709939,0
+plaintext,none,none,200,384,8,5,1.0,3.127699950709939,0
+plaintext,none,none,200,384,8,10,1.0,3.127699950709939,0
+plaintext,none,none,200,384,9,1,1.0,3.10700002592057,0
+plaintext,none,none,200,384,9,5,1.0,3.10700002592057,0
+plaintext,none,none,200,384,9,10,1.0,3.10700002592057,0
+two_server_qp,info-theoretic,query_private,200,384,0,1,1.0,24.76519998162985,0
+two_server_qp,info-theoretic,query_private,200,384,0,5,1.0,24.76519998162985,0
+two_server_qp,info-theoretic,query_private,200,384,0,10,1.0,24.76519998162985,0
+two_server_qp,info-theoretic,query_private,200,384,1,1,1.0,24.736499995924532,0
+two_server_qp,info-theoretic,query_private,200,384,1,5,1.0,24.736499995924532,0
+two_server_qp,info-theoretic,query_private,200,384,1,10,1.0,24.736499995924532,0
+two_server_qp,info-theoretic,query_private,200,384,2,1,1.0,24.659299990162253,0
+two_server_qp,info-theoretic,query_private,200,384,2,5,1.0,24.659299990162253,0
+two_server_qp,info-theoretic,query_private,200,384,2,10,1.0,24.659299990162253,0
+two_server_qp,info-theoretic,query_private,200,384,3,1,1.0,24.72650003619492,0
+two_server_qp,info-theoretic,query_private,200,384,3,5,1.0,24.72650003619492,0
+two_server_qp,info-theoretic,query_private,200,384,3,10,1.0,24.72650003619492,0
+two_server_qp,info-theoretic,query_private,200,384,4,1,1.0,24.930400075390935,0
+two_server_qp,info-theoretic,query_private,200,384,4,5,1.0,24.930400075390935,0
+two_server_qp,info-theoretic,query_private,200,384,4,10,1.0,24.930400075390935,0
+two_server_qp,info-theoretic,query_private,200,384,5,1,1.0,25.96210001502186,0
+two_server_qp,info-theoretic,query_private,200,384,5,5,1.0,25.96210001502186,0
+two_server_qp,info-theoretic,query_private,200,384,5,10,1.0,25.96210001502186,0
+two_server_qp,info-theoretic,query_private,200,384,6,1,1.0,24.643799988552928,0
+two_server_qp,info-theoretic,query_private,200,384,6,5,1.0,24.643799988552928,0
+two_server_qp,info-theoretic,query_private,200,384,6,10,1.0,24.643799988552928,0
+two_server_qp,info-theoretic,query_private,200,384,7,1,1.0,25.035600061528385,0
+two_server_qp,info-theoretic,query_private,200,384,7,5,1.0,25.035600061528385,0
+two_server_qp,info-theoretic,query_private,200,384,7,10,1.0,25.035600061528385,0
+two_server_qp,info-theoretic,query_private,200,384,8,1,1.0,25.062500033527613,0
+two_server_qp,info-theoretic,query_private,200,384,8,5,1.0,25.062500033527613,0
+two_server_qp,info-theoretic,query_private,200,384,8,10,1.0,25.062500033527613,0
+two_server_qp,info-theoretic,query_private,200,384,9,1,1.0,24.936300003901124,0
+two_server_qp,info-theoretic,query_private,200,384,9,5,1.0,24.936300003901124,0
+two_server_qp,info-theoretic,query_private,200,384,9,10,1.0,24.936300003901124,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,0,1,1.0,3348.264900036156,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,0,5,1.0,3348.264900036156,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,0,10,1.0,3348.264900036156,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,1,1,1.0,3492.126900004223,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,1,5,1.0,3492.126900004223,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,1,10,1.0,3492.126900004223,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,2,1,1.0,3398.9581000059843,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,2,5,1.0,3398.9581000059843,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,2,10,1.0,3398.9581000059843,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,3,1,1.0,3473.865699954331,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,3,5,1.0,3473.865699954331,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,3,10,1.0,3473.865699954331,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,4,1,1.0,3373.5755999805406,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,4,5,1.0,3373.5755999805406,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,4,10,1.0,3373.5755999805406,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,5,1,1.0,3466.5260000620037,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,5,5,1.0,3466.5260000620037,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,5,10,1.0,3466.5260000620037,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,6,1,1.0,3414.523100014776,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,6,5,1.0,3414.523100014776,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,6,10,1.0,3414.523100014776,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,7,1,1.0,3447.4065999966115,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,7,5,1.0,3447.4065999966115,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,7,10,1.0,3447.4065999966115,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,8,1,1.0,3381.810799939558,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,8,5,1.0,3381.810799939558,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,8,10,1.0,3381.810799939558,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,9,1,1.0,3494.6054000174627,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,9,5,1.0,3494.6054000174627,0
+ckks_8192,IND-CPA (RLWE),both_encrypted,200,384,9,10,1.0,3494.6054000174627,0
