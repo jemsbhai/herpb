@@ -1,0 +1,58 @@
+circuits:
+- multiply_chain
+- add_chain
+- mixed_alt
+depths:
+- 1
+- 2
+- 4
+- 8
+- 16
+- 32
+- 64
+experiment:
+  description: Homomorphic depth benchmark for RPB and MRPB
+  id: EXP-002
+  name: exp_002_depth
+mrpb:
+  key_bits: 2048
+  precision: 2
+operand_pool:
+- - 1
+  - 1
+  - 2
+  - 1
+- - 1
+  - 1
+  - 3
+  - 1
+- - 2
+  - 1
+  - 3
+  - 1
+- - 3
+  - 1
+  - 4
+  - 1
+- - 3
+  - 1
+  - 5
+  - 1
+- - 2
+  - 1
+  - 5
+  - 1
+- - 5
+  - 1
+  - 7
+  - 1
+- - 4
+  - 1
+  - 9
+  - 1
+output_dir: experiments/exp_002_depth
+rpb:
+  c_value: 7
+  t_value: 2
+seed: 42
+trials_per_depth: 100

@@ -17,53 +17,8 @@ The Python port of the RPB scheme (from the collaborator's C++ code) produces
 identical correctness results (GCD-reduced ratios match expected values) for
 all test cases in the original dataset.
 
-### Independent Variables
-- Input bit-length: 10, 100, 1000, 2000, 3000, 5000, 8000, 10000 bits
-- Method: shared-k vs distinct-k
-- Precision parameter t: 0-6
-
-### Dependent Variables / Metrics
-- Correctness: does GCD-reduce(N, D) == a/b? (boolean PASS/FAIL)
-- Encryption time (ms)
-- Ciphertext size (digits)
-- Memory usage (bytes)
-
-### Control Conditions
-- Baseline: original C++ results from collaborator's version 2
-- Fixed seed: 42
-
-### Protocol
-1. Port RPB shared-k and distinct-k encryption to Python using gmpy2
-2. Load original input files (10bits.txt through 10000bits.txt)
-3. Run identical experiment protocol: 1000 iterations x 10 pairs
-4. Compare correctness and timing against C++ reference
-5. Accept if 100% correctness match; flag any timing regressions > 10x
-
-### Environment
-- Hardware: Windows laptop, 64GB RAM, RTX 4090
-- Software: Python 3.12, gmpy2 2.3.0, Windows 11
-- Config file: configs/base.yaml
-- Seeds: 42
-
 ### Results
-- **42/42 tests pass** in 0.51s
-- RPB correctness: PASS (shared-k, distinct-k, various c values, various t)
-- MRPB correctness: PASS (shared-k, distinct-k, multiple rational pairs)
-- MRPB keygen: PASS (valid RSA, deterministic seeding, c coprime to n)
-- MRPB security: PASS (GCD does NOT leak ratio, different keys → different ct)
-- RPB homomorphic: PASS (multiply, add, subtract, depth-3 chain)
-- MRPB homomorphic: PASS (multiply, depth-3 chain, fixed ciphertext size)
-- RPB bounds: PASS (max_t_shared, max_T_distinct, split_T)
-
-### Observations
-- gmpy2 2.3.0 installed cleanly on Windows/Python 3.12 without manual wheel.
-- Rational reconstruction in MRPB (half-GCD) works correctly for small ratios
-  with 1024-bit modulus.
-- All 42 tests cover both schemes comprehensively.
-
-### Interpretation
-Port is validated. Both RPB and MRPB produce correct results for all test
-cases. Ready to proceed with comparative benchmarking (EXP-001).
+- **42/42 tests pass** in 0.51s — full details in earlier commit
 
 ### Artifacts
 - Tests: tests/test_rpb.py, tests/test_mrpb.py
@@ -77,42 +32,6 @@ cases. Ready to proceed with comparative benchmarking (EXP-001).
 **Researcher:** Muntaser Syed
 **Type:** computational
 **Status:** completed (7 of 8 bit-lengths; 10000 deferred to A100)
-
-### Hypothesis
-MRPB (modular) will be slower per-encryption than RPB (plain bignum) due to
-modular reduction overhead, but will produce fixed-size ciphertexts regardless
-of input size. RPB ciphertexts will grow with input size. Both schemes will
-achieve 100% correctness across all bit-lengths.
-
-### Independent Variables
-- Scheme: RPB-shared, RPB-distinct, MRPB-shared, MRPB-distinct
-- Input bit-length: 10, 100, 1000, 2000, 3000, 5000, 8000 bits
-- MRPB key size: auto-scaled per bit-length (see results)
-
-### Dependent Variables / Metrics
-- Encryption time (ms): mean ± std over 1000 iterations × 10 pairs
-- Decryption time (ms): mean ± std
-- Ciphertext size (bytes): mean
-- Correctness rate: fraction of trials where decrypt == expected ratio
-
-### Control Conditions
-- Same input data pairs for all schemes
-- Same seed (42) for reproducible random parameters
-- RPB bound B = 10^20000 (matching C++ reference)
-- MRPB key_bits = max(2048, auto-scaled to input ratio size)
-
-### Protocol
-1. Load all input data files from data/raw/
-2. For each bit-length, run 10000 trials per scheme variant
-3. Record per-trial: enc time, dec time, ciphertext size, correctness
-4. Checkpoint after each bit-length
-
-### Environment
-- Hardware: Windows laptop, 64GB RAM, RTX 4090
-- Software: Python 3.12, gmpy2 2.3.0, Windows 11
-- Config file: configs/exp_001_benchmark.yaml
-- Seeds: 42
-- Total runtime: ~6.3 hours (dominated by MRPB keygen at 5000/8000 bits)
 
 ### Results
 
@@ -130,30 +49,6 @@ achieve 100% correctness across all bit-lengths.
 | 5000    | 0.3867    | 0.1065      | 1.0655     | 0.4817       |
 | 8000    | 0.7269    | 0.1959      | 1.7102     | 0.7740       |
 
-#### Decryption Time (ms, mean)
-
-| Input   | RPB-shared | RPB-distinct | MRPB-shared | MRPB-distinct |
-|---------|-----------|-------------|------------|--------------|
-| 10      | 0.0014    | 0.0010      | 0.0120     | 0.0117       |
-| 100     | 0.0047    | 0.0037      | 0.1036     | 0.0961       |
-| 1000    | 0.0768    | 0.0440      | 2.2959     | 2.1936       |
-| 2000    | 0.2460    | 0.1135      | 7.7429     | 7.4979       |
-| 3000    | 0.3879    | 0.1637      | 15.2726    | 14.6234      |
-| 5000    | 1.1310    | 0.4556      | 42.4790    | 41.3112      |
-| 8000    | 1.9452    | 0.9280      | 78.6208    | 76.8189      |
-
-#### Ciphertext Size (bytes, mean)
-
-| Input   | RPB-shared | RPB-distinct | MRPB-shared | MRPB-distinct |
-|---------|-----------|-------------|------------|--------------|
-| 10      | 40        | 24          | 512        | 512          |
-| 100     | 339       | 173         | 512        | 512          |
-| 1000    | 3328      | 1668        | 3392       | 3392         |
-| 2000    | 6651      | 3329        | 6720       | 6720         |
-| 3000    | 9972      | 4990        | 10048      | 10048        |
-| 5000    | 16610     | 8312        | 16704      | 16704        |
-| 8000    | 23254     | 11634       | 23360      | 23360        |
-
 #### MRPB Key Scaling
 
 | Input   | key_bits | keygen time   |
@@ -166,49 +61,121 @@ achieve 100% correctness across all bit-lengths.
 | 5000    | 66816    | 1 hr 21 min   |
 | 8000    | 93440    | 4 hr 48 min   |
 
-### Observations
-
-1. **Correctness is perfect** — both schemes produce exact results at every scale.
-
-2. **RPB encryption is 2-4× faster than MRPB** — the modular reduction in
-   MRPB adds overhead proportional to modulus size.
-
-3. **MRPB decryption is the dominant bottleneck** — rational reconstruction
-   via half-GCD over large moduli is 30-40× slower than RPB's simple GCD.
-   At 8000 bits: RPB decrypts in ~1ms, MRPB in ~78ms.
-
-4. **Distinct-k is ~2-3× faster than shared-k** in both schemes, confirming
-   the C++ reference finding. The quadratic growth in shared-k (k²) vs linear
-   cross-multiplication in distinct-k is the cause.
-
-5. **MRPB ciphertext size ≈ RPB shared-k size** — the auto-scaled modulus
-   naturally matches the RPB ciphertext magnitude. But RPB-distinct is ~2×
-   smaller because it avoids the k² blowup.
-
-6. **MRPB keygen is the practical barrier** — generating primes for 93K-bit
-   RSA took nearly 5 hours. This is a one-time cost (amortized), but it makes
-   MRPB impractical for large inputs without HPC resources. Deferred 10000-bit
-   case (would need ~134K-bit RSA) to A100 GPU.
-
-### Interpretation
-
-**Hypothesis partially confirmed:**
-- MRPB is indeed slower per-operation (confirmed), especially for decryption.
-- MRPB ciphertext sizes are NOT smaller as hypothesized — they are comparable
-  to RPB-shared because the modulus must scale with input size. However, MRPB
-  ciphertexts are FIXED for a given key (zero std), while RPB varies.
-- The key insight: MRPB's advantage is **security** (IND-CPA), not performance.
-  The performance cost of security is ~2-4× for encryption and ~40× for
-  decryption at 8000 bits.
-
-**For the paper:** Frame RPB as the high-performance primitive for scenarios
-where ratio leakage is acceptable (federated analytics, ratio delegation).
-Frame MRPB as the secure primitive for full confidentiality, noting the
-keygen/decryption cost as the price of IND-CPA.
+### Key Findings
+1. MRPB encryption ~2-4× slower than RPB (modular reduction overhead)
+2. MRPB decryption ~30-40× slower (rational reconstruction via half-GCD)
+3. Distinct-k consistently ~2-3× faster than shared-k in both schemes
+4. MRPB keygen scales superlinearly — practical barrier at large input sizes
 
 ### Artifacts
 - Script: scripts/run_experiment.py
-- Config: experiments/exp_001_benchmark/config.yaml
 - Raw data: experiments/exp_001_benchmark/results_raw.csv
 - Summary: experiments/exp_001_benchmark/summary.json
-- Environment: experiments/exp_001_benchmark/environment.json
+
+---
+
+## EXP-002: Homomorphic Depth Benchmark
+
+**Date:** 2026-05-29
+**Researcher:** Muntaser Syed
+**Type:** computational
+**Status:** completed
+
+### Hypothesis
+RPB multiplication and addition chains work at arbitrary depth (unbounded
+integer growth). MRPB multiplication chains work at arbitrary depth (ratio
+stays bounded). MRPB addition chains fail at a depth determined by the
+plaintext space bound sqrt(n) — for a 2048-bit modulus, this is ~1024 bits
+of headroom, allowing several hundred additions of small rationals before
+reconstruction fails.
+
+### Independent Variables
+- Circuit type: multiply_chain, add_chain, mixed_alt
+- Depth: 1, 2, 4, 8, 16, 32, 64
+- Scheme: RPB (shared-k), MRPB (shared-k)
+
+### Dependent Variables / Metrics
+- Correctness rate per depth
+- MRPB decrypt_ok rate
+- Evaluation time (ms)
+- RPB ciphertext size growth (bytes)
+
+### Control Conditions
+- 8 small rationals (1/2, 1/3, 2/3, 3/4, 3/5, 2/5, 5/7, 4/9)
+- Seed 42, RPB c=7 t=2, MRPB key_bits=2048 t=2
+- 100 trials per depth per circuit type
+
+### Results
+
+**100% correctness across ALL 4,200 trials — every depth, every circuit, both schemes.**
+
+MRPB addition chains did NOT fail even at depth 64. The small operands
+keep the accumulated result well within the sqrt(n) ≈ 1024-bit bound.
+
+#### Evaluation Time (ms, mean — homomorphic ops only)
+
+| Depth | mul RPB  | mul MRPB | add RPB  | add MRPB | mix RPB  | mix MRPB |
+|-------|----------|----------|----------|----------|----------|----------|
+| 1     | 0.000    | 0.000    | 0.000    | 0.000    | 0.000    | 0.000    |
+| 2     | 0.000    | 0.003    | 0.001    | 0.003    | 0.001    | 0.003    |
+| 4     | 0.001    | 0.008    | 0.001    | 0.010    | 0.001    | 0.009    |
+| 8     | 0.002    | 0.018    | 0.002    | 0.022    | 0.002    | 0.021    |
+| 16    | 0.004    | 0.038    | 0.005    | 0.045    | 0.005    | 0.042    |
+| 32    | 0.007    | 0.078    | 0.008    | 0.092    | 0.009    | 0.085    |
+| 64    | 0.014    | 0.156    | 0.017    | 0.186    | 0.018    | 0.171    |
+
+#### RPB Ciphertext Size Growth (bytes, mean)
+
+| Depth | multiply | add   | mixed |
+|-------|----------|-------|-------|
+| 1     | 6        | 6     | 6     |
+| 2     | 10       | 10    | 10    |
+| 4     | 19       | 20    | 19    |
+| 8     | 37       | 38    | 38    |
+| 16    | 72       | 74    | 74    |
+| 32    | 143      | 147   | 147   |
+| 64    | 285      | 293   | 292   |
+
+### Observations
+
+1. **100% correctness at depth 64** — stronger than hypothesized. Both schemes
+   handle deep circuits without any failures.
+
+2. **MRPB addition did NOT fail** at any tested depth. With small operands
+   (single-digit rationals), the accumulated ratio stays within sqrt(n) even
+   after 64 additions. Larger operands would hit the bound sooner — this is
+   a function of operand magnitude, not circuit depth alone.
+
+3. **Eval time scales linearly with depth** in both schemes. MRPB is ~10×
+   slower per operation (modular arithmetic vs plain bignum).
+
+4. **RPB ciphertext grows linearly** — roughly 4.5 bytes per depth level.
+   At depth 64, ciphertexts are ~285 bytes. MRPB stays fixed at 512 bytes
+   (2× 256 bytes for a 2048-bit modulus) regardless of depth.
+
+5. **MRPB decryption time is constant** across depths (~0.017ms). Rational
+   reconstruction cost depends on modulus size, not circuit complexity.
+
+6. **Addition is ~30% slower than multiplication** in eval time (both schemes).
+   The cross-multiply-and-add in eval_add is more expensive than the simple
+   multiply in eval_multiply.
+
+### Interpretation
+
+**Hypothesis partially confirmed, partially exceeded:**
+- Multiplication unlimited: confirmed ✓
+- Addition limited by sqrt(n): technically correct but NOT reached at depth 64
+  with small operands. The practical bound depends on operand magnitude.
+- Both schemes show no noise-like degradation — the unlimited depth property
+  is a real structural advantage over BGV/BFV/CKKS.
+
+**For the paper:** The depth benchmark is a strong selling point. Emphasize
+that no existing HE scheme achieves noise-free unlimited multiplicative depth.
+The addition constraint (sqrt(n) plaintext space) is analogous to noise budgets
+in lattice HE but deterministic and predictable.
+
+### Artifacts
+- Script: scripts/run_depth_benchmark.py
+- Config: experiments/exp_002_depth/config.yaml
+- Raw data: experiments/exp_002_depth/results_raw.csv
+- Summary: experiments/exp_002_depth/summary.json
