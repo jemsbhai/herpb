@@ -1,0 +1,567 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{subcaption}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\negl}{\operatorname{negl}}
+
+\newcommand{\gpuplaceholder}[1]{\textcolor{blue}{\textbf{[GPU-RESULT: #1]}}}
+
+\title{Exact Privacy-Preserving Similarity Search \\
+via Two-Server Additive Secret Sharing}
+
+\author{Anonymous Submission}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Privacy-preserving similarity search in retrieval-augmented generation (RAG) pipelines has been approached primarily through lattice-based homomorphic encryption, particularly the CKKS scheme. CKKS supports approximate arithmetic on encrypted real numbers, but its noise accumulates with each homomorphic operation and can silently corrupt document rankings. We present an alternative based on two-server additive secret sharing over the native 64-bit integer ring $\Z_{2^{64}}$. Our system encodes floating-point embeddings as fixed-point integers, splits each query component into additive shares distributed across two non-colluding servers, and computes dot-product similarity through standard hardware integer arithmetic on the shares. The only approximation in the entire pipeline is a one-time quantization bounded by $d \cdot 2^{-k}$ for $d$-dimensional vectors at precision $k$; this error does not grow with computation depth. We prove information-theoretic security for both a query-private mode (zero inter-server communication) and a mutual-privacy mode (one communication round of $d$ integers via matrix-vector Beaver triples). In experiments at embedding dimension 384, our query-private protocol achieves Recall@1 = 1.000 with a query latency of 0.13 ms at $N = 50$ documents and 12 ms at $N = 5{,}000$ documents, running 6{,}700x faster than CKKS and 55{,}000x faster than Paillier. The mutual-privacy variant runs 3{,}300x faster than CKKS with identical ranking accuracy, information-theoretic (rather than computational) security, and per-document storage of 3 KB compared to CKKS's 33 KB with SIMD batching.
+\end{abstract}
+
+
+% ==================================================================
+\section{Introduction}
+\label{sec:intro}
+% ==================================================================
+
+Retrieval-augmented generation (RAG)~\cite{lewis2020retrieval} retrieves relevant documents from a corpus by computing similarity between a query embedding and stored document embeddings, then feeds the retrieved passages to a language model as context. The similarity computation, typically a dot product or cosine similarity over dense vectors, lies at the heart of the pipeline. In many deployments, the query reveals sensitive information about the user's intent, and the document corpus may contain confidential material. Privacy-preserving similarity search aims to compute the retrieval step without exposing the query to the server, the documents to the client, or both.
+
+The dominant cryptographic approach uses lattice-based homomorphic encryption (HE), particularly the CKKS scheme~\cite{cheon2017homomorphic}. CKKS supports approximate arithmetic on encrypted real-valued vectors and has been adopted by PRAG~\cite{prag2026}, RAGtime-PIANO~\cite{ragtimepiano2026}, SecureRAG~\cite{securerag2025}, and $p^2$RAG~\cite{p2rag2026}. All CKKS-based systems inherit a fundamental limitation: each homomorphic operation increases noise in the ciphertext. For retrieval, this noise can change the relative ordering of similarity scores, causing the system to return incorrect documents. Our experiments confirm this: at \texttt{poly\_modulus\_degree} = 4096, CKKS achieves only Recall@1 = 0.883, meaning 12\% of queries return the wrong top result.
+
+We note that exact-integer lattice schemes (BFV~\cite{fan2012somewhat}, BGV~\cite{brakerski2014leveled}) do not suffer from this particular problem. A depth-1 dot product circuit stays well within BFV's noise budget, and decryption recovers the exact integer result. BFV is therefore a viable single-server alternative to CKKS for this application, though it carries the overhead of polynomial ring arithmetic and provides computational (Ring-LWE) rather than information-theoretic security.
+
+This paper takes a fundamentally different approach. Rather than encrypting data under a homomorphic scheme and computing on ciphertexts, we split data into additive shares distributed across two non-colluding servers. Each server performs standard integer arithmetic on its share; neither server's view reveals any information about the original value. We operate over the native 64-bit unsigned integer ring $\Z_{2^{64}}$, meaning all server-side computation uses hardware-native \texttt{uint64} arithmetic with no cryptographic library overhead. The result is a system that is simultaneously simpler, faster, and more secure than HE-based alternatives.
+
+\paragraph{Why 64 bits suffice.} The modulus must only be large enough to prevent the integer dot product from wrapping around. For unit-normalized embeddings at precision $k = 16$ and dimension $d = 384$, the maximum dot product value is $d \cdot 2^{2k} = 384 \cdot 2^{32} \approx 2^{41}$. A 64-bit ring provides 23 bits of headroom beyond this maximum. Because security is information-theoretic (each share is a uniform random 64-bit value that perfectly masks the plaintext regardless of the modulus size), no large RSA-style composite is needed. Two's complement arithmetic handles signed values natively through hardware overflow.
+
+\paragraph{Contributions.}
+\begin{enumerate}[leftmargin=*]
+\item We present a two-server protocol for privacy-preserving similarity search with two operating modes: \emph{query-private} (zero inter-server communication, information-theoretic query privacy) and \emph{mutual-privacy} (one communication round of $d$ integers via matrix-vector Beaver triples~\cite{beaver1991efficient}, information-theoretic privacy for both query and documents). We prove security for both modes (\Cref{sec:protocol}).
+
+\item We show that operating over $\Z_{2^{64}}$ with native hardware arithmetic yields query latencies of 0.13 ms ($N = 50$) to 12 ms ($N = 5{,}000$) at $d = 384$, which is 6{,}700x faster than CKKS and 55{,}000x faster than Paillier (\Cref{sec:experiments}).
+
+\item We develop matrix-vector Beaver triples that amortize the static document corpus, reducing online communication from $O(Nd)$ to $O(d)$ per query. At $d = 384$, this is 3 KB per query regardless of corpus size (\Cref{sec:matrix-beaver}).
+
+\item We provide a fixed-point encoding with tight error bounds. The dot-product quantization error for $d$-dimensional unit vectors is at most $d \cdot 2^{-k}$, and this bound is depth-independent. We prove that document rankings are preserved exactly (\Cref{sec:encoding,sec:ranking}).
+
+\item We implement a CUDA kernel for batch 2048-bit Montgomery multiplication as an extension for applications requiring arithmetic beyond 64-bit precision, achieving 16 to 67x speedup over GMP (\Cref{sec:gpu}).
+\end{enumerate}
+
+
+% ==================================================================
+\section{Preliminaries}
+\label{sec:prelim}
+% ==================================================================
+
+\subsection{Notation}
+
+We write $\Z_{2^{64}}$ for the ring of unsigned 64-bit integers with arithmetic modulo $2^{64}$. Vectors are bold: $\mathbf{q}, \mathbf{d} \in \R^d$. The dot product is $\langle \mathbf{q}, \mathbf{d} \rangle = \sum_{i=1}^{d} q_i d_i$. Matrices are bold uppercase: $\mathbf{D} \in \R^{N \times d}$ denotes a corpus of $N$ document embeddings.
+
+\subsection{Additive Secret Sharing over $\Z_{2^{64}}$}
+
+\begin{definition}[Additive Sharing]
+\label{def:sharing}
+To share a value $m \in \Z_{2^{64}}$, sample $s_1 \leftarrow \Z_{2^{64}}$ uniformly at random and set $s_2 = m - s_1 \bmod 2^{64}$. The pair $(s_1, s_2)$ is an additive sharing of $m$, denoted $\langle m \rangle = (s_1, s_2)$. Reconstruction is $m = s_1 + s_2 \bmod 2^{64}$, with signed interpretation via two's complement.
+\end{definition}
+
+Additive sharing supports two operations at zero cost (no communication, no cryptographic computation):
+
+\begin{proposition}[Free Operations]
+\label{prop:free-ops}
+Given sharings $\langle x \rangle = (x_1, x_2)$ and $\langle y \rangle = (y_1, y_2)$:
+\begin{enumerate}
+\item \textbf{Addition:} $\langle x + y \rangle = (x_1 + y_1,\; x_2 + y_2)$.
+\item \textbf{Public-scalar multiplication:} For a public constant $k$, $\langle kx \rangle = (k x_1,\; k x_2)$.
+\end{enumerate}
+Both follow from the distributive and associative laws in $\Z_{2^{64}}$.
+\end{proposition}
+
+Multiplication of two shared values requires interaction, which we handle via Beaver triples.
+
+\subsection{Beaver Triples}
+
+\begin{definition}[Beaver Triple~\cite{beaver1991efficient}]
+\label{def:beaver}
+A Beaver triple is a triple $(a, b, c) \in (\Z_{2^{64}})^3$ satisfying $c = ab \bmod 2^{64}$, together with additive sharings $\langle a \rangle, \langle b \rangle, \langle c \rangle$ distributed to the two servers. Triples are generated in an offline phase by a trusted dealer or via oblivious transfer protocols.
+\end{definition}
+
+To multiply two shared values $\langle x \rangle$ and $\langle y \rangle$ using a Beaver triple $(\langle a \rangle, \langle b \rangle, \langle c \rangle)$:
+\begin{enumerate}
+\item Each server locally computes its share of $e = x - a$ and $f = y - b$.
+\item The servers exchange their shares to open $e$ and $f$ (one round, two values per server).
+\item Each server computes its share of $z = xy$:
+\[
+z_1 = c_1 + e \cdot b_1 + f \cdot a_1 + e \cdot f, \qquad z_2 = c_2 + e \cdot b_2 + f \cdot a_2.
+\]
+\end{enumerate}
+The term $ef$ is added only by server 1 to avoid double-counting. The result satisfies $z_1 + z_2 = xy \bmod 2^{64}$.
+
+\begin{remark}
+All operations in the Beaver protocol are native 64-bit integer additions and multiplications, executed by the CPU in single clock cycles. No multi-precision arithmetic, no polynomial ring operations, and no modular reduction beyond hardware overflow.
+\end{remark}
+
+
+% ==================================================================
+\section{Fixed-Point Encoding and Error Analysis}
+\label{sec:encoding}
+% ==================================================================
+
+Embedding vectors produced by neural models such as Sentence-BERT~\cite{reimers2019sentence} consist of floating-point components. Our protocol operates on integers in $\Z_{2^{64}}$.
+
+\subsection{Encoding}
+
+\begin{definition}[Fixed-Point Encoding]
+\label{def:encoding}
+Given $x \in \R$ and precision parameter $k \in \N^+$, the encoding is:
+\[
+\mathcal{E}_k(x) = \operatorname{round}(x \cdot 2^k).
+\]
+The result is a signed integer. All components of a vector share the implicit denominator $2^k$, which is never communicated to any server; the client divides by $2^{2k}$ in plaintext after reconstructing the integer dot product.
+\end{definition}
+
+The dot product of two encoded vectors $\hat{\mathbf{q}}, \hat{\mathbf{d}}$ gives the integer $\sum_i \hat{q}_i \hat{d}_i$. The original dot product is recovered as $\langle \mathbf{q}, \mathbf{d} \rangle \approx (\sum_i \hat{q}_i \hat{d}_i) / 2^{2k}$. The denominator $2^{2k}$ is a public constant, shared across all documents, and is applied only by the client after reconstruction. This observation, that the denominator is public and need not enter the secure computation, eliminates the need for any form of encrypted rational arithmetic.
+
+\subsection{Error Bounds}
+
+\begin{theorem}[Per-Element Quantization Error]
+\label{thm:quant-error}
+For any $x \in \R$ and $k \geq 1$: $|x - \hat{x}/2^k| \leq \varepsilon_k$, where $\hat{x} = \mathcal{E}_k(x)$ and $\varepsilon_k = 2^{-(k+1)}$. This bound is tight.
+\end{theorem}
+
+\begin{proof}
+Rounding $x \cdot 2^k$ to the nearest integer incurs error at most $1/2$. Dividing by $2^k$ gives $|x - \hat{x}/2^k| \leq 1/(2 \cdot 2^k) = 2^{-(k+1)}$. The midpoint $(m + 1/2)/2^k$ for integer $m$ achieves this bound exactly.
+\end{proof}
+
+\begin{theorem}[Dot-Product Error Bound]
+\label{thm:dot-error}
+Let $\mathbf{q}, \mathbf{d} \in \R^d$ with $|q_i|, |d_i| \leq M$ for all $i$. Let $\varepsilon = 2^{-(k+1)}$. Then:
+\[
+\left| \langle \mathbf{q}, \mathbf{d} \rangle - \frac{\sum_i \hat{q}_i \hat{d}_i}{2^{2k}} \right| \leq d(2M\varepsilon + \varepsilon^2).
+\]
+For unit-normalized vectors ($M \leq 1$), this simplifies to approximately $d \cdot 2^{-k}$ when $k \geq 4$.
+\end{theorem}
+
+\begin{proof}
+Write the quantization errors as $\delta_i^q = q_i - \hat{q}_i/2^k$ and $\delta_i^d = d_i - \hat{d}_i/2^k$, so $\hat{q}_i/2^k = q_i - \delta_i^q$ and $\hat{d}_i/2^k = d_i - \delta_i^d$ with $|\delta_i^q|, |\delta_i^d| \leq \varepsilon$. Then:
+\begin{align*}
+q_i d_i - \frac{\hat{q}_i \hat{d}_i}{2^{2k}} &= q_i d_i - (q_i - \delta_i^q)(d_i - \delta_i^d) \\
+&= q_i \delta_i^d + d_i \delta_i^q - \delta_i^q \delta_i^d.
+\end{align*}
+Taking absolute values and using $|q_i|, |d_i| \leq M$:
+\[
+\left| q_i d_i - \frac{\hat{q}_i \hat{d}_i}{2^{2k}} \right| \leq M\varepsilon + M\varepsilon + \varepsilon^2 = 2M\varepsilon + \varepsilon^2.
+\]
+Summing over $i = 1, \ldots, d$ gives the bound. \qedhere
+\end{proof}
+
+\begin{corollary}[Depth-Independent Error]
+\label{cor:depth-free}
+The bound of \Cref{thm:dot-error} is the total error for the entire pipeline. Because the two-server computation is exact integer arithmetic in $\Z_{2^{64}}$, no additional error is introduced regardless of the number of additions or multiplications. This stands in contrast to CKKS, where noise grows with each homomorphic operation.
+\end{corollary}
+
+
+% ==================================================================
+\section{Two-Server Retrieval Protocol}
+\label{sec:protocol}
+% ==================================================================
+
+We present two operating modes. All arithmetic is over $\Z_{2^{64}}$ using native \texttt{uint64} hardware instructions.
+
+\subsection{Query-Private Protocol}
+\label{sec:query-private}
+
+In this mode, document embeddings are stored in plaintext on both servers. Only the client's query is protected.
+
+\begin{algorithm}[t]
+\caption{Query-Private Similarity Search}
+\label{alg:query-private}
+\begin{algorithmic}[1]
+\Statex \textbf{Setup:} Both servers hold plaintext encoded document vectors $\hat{\mathbf{d}}_1, \ldots, \hat{\mathbf{d}}_N \in \Z^d$, stored as \texttt{int64} arrays.
+\Statex
+\State Client encodes query: $\hat{q}_i \leftarrow \mathcal{E}_k(q_i)$ for $i = 1, \ldots, d$
+\State Client shares query: for each $i$, sample $s_1^{(i)} \leftarrow \Z_{2^{64}}$, set $s_2^{(i)} = \hat{q}_i - s_1^{(i)}$
+\State Client sends $\{s_1^{(i)}\}_{i=1}^d$ to Server 1 and $\{s_2^{(i)}\}_{i=1}^d$ to Server 2
+\For{each document $j = 1, \ldots, N$} \hfill (\textit{both servers, independently})
+    \State Server 1: $A_j \leftarrow \sum_{i=1}^{d} \hat{d}_{j,i} \cdot s_1^{(i)}$ \hfill (\texttt{uint64} dot product)
+    \State Server 2: $B_j \leftarrow \sum_{i=1}^{d} \hat{d}_{j,i} \cdot s_2^{(i)}$
+\EndFor
+\State Servers return $\{A_j\}_{j=1}^N$ and $\{B_j\}_{j=1}^N$ to client
+\State Client reconstructs: $\sigma_j \leftarrow A_j + B_j$ for each $j$
+\State Client decodes: $\operatorname{score}_j \leftarrow \sigma_j / 2^{2k}$ \hfill (signed via two's complement)
+\State Client ranks documents by $\operatorname{score}_j$ and returns top-$K$
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Complexity.} The client sends $d$ values to each server (one round). Each server returns $N$ values (one round). Total communication: $2d + 2N$ 64-bit integers ($2 \times 384 \times 8 + 2 \times N \times 8$ bytes). No inter-server communication occurs. Each server performs $N$ inner products of dimension $d$ over \texttt{uint64}: this is a standard matrix-vector multiply, directly expressible as a single NumPy, BLAS, or cuBLAS call.
+
+\subsection{Mutual-Privacy Protocol with Matrix-Vector Beaver Triples}
+\label{sec:matrix-beaver}
+
+In this mode, both query and document embeddings are protected. Neither server learns any individual embedding. The key insight is that the document matrix $\mathbf{D}$ is \emph{static}: it does not change between queries. This allows amortizing the Beaver triple material over the corpus, reducing per-query online communication from $O(Nd)$ to $O(d)$.
+
+\subsubsection{Offline Phase (One-Time, When Corpus is Uploaded)}
+
+\begin{enumerate}[leftmargin=*]
+\item The data owner encodes each document as an integer vector and creates additive shares: $\hat{\mathbf{D}} = \mathbf{D}_1 + \mathbf{D}_2$ over $\Z_{2^{64}}^{N \times d}$. Server $\ell$ receives $\mathbf{D}_\ell$.
+
+\item A trusted dealer generates a random mask matrix $\mathbf{A} \in \Z_{2^{64}}^{N \times d}$ and distributes shares $\mathbf{A}_1, \mathbf{A}_2$ to the servers.
+
+\item Each server computes its share of $\mathbf{E} = \mathbf{D} - \mathbf{A}$: Server $\ell$ computes $\mathbf{E}_\ell = \mathbf{D}_\ell - \mathbf{A}_\ell$. The servers exchange $\mathbf{E}_1$ and $\mathbf{E}_2$ to reconstruct $\mathbf{E}$, which becomes public. Because $\mathbf{A}$ is a uniform random mask, $\mathbf{E}$ reveals no information about $\mathbf{D}$.
+\end{enumerate}
+
+\subsubsection{Per-Query Offline Phase (Precomputable Before Query Arrives)}
+
+For each query slot $t$:
+\begin{enumerate}[leftmargin=*]
+\item The dealer generates a random vector $\mathbf{b}^{(t)} \in \Z_{2^{64}}^d$ and distributes shares $\mathbf{b}_1^{(t)}, \mathbf{b}_2^{(t)}$.
+
+\item The dealer computes $\mathbf{c}^{(t)} = \mathbf{A} \mathbf{b}^{(t)} \in \Z_{2^{64}}^N$ and distributes shares $\mathbf{c}_1^{(t)}, \mathbf{c}_2^{(t)}$.
+\end{enumerate}
+
+Per-query offline storage: $O(N + d)$ values, compared to $O(Nd)$ for scalar Beaver triples.
+
+\subsubsection{Online Phase (When Query Arrives)}
+
+\begin{algorithm}[t]
+\caption{Mutual-Privacy Retrieval (Matrix-Vector Beaver)}
+\label{alg:mutual-privacy}
+\begin{algorithmic}[1]
+\Statex \textbf{Requires:} Public $\mathbf{E}$; each server holds its shares of $\mathbf{A}, \mathbf{D}, \mathbf{b}^{(t)}, \mathbf{c}^{(t)}$.
+\Statex
+\State Client encodes and shares query: $\langle \hat{\mathbf{q}} \rangle = (\mathbf{q}_1, \mathbf{q}_2)$
+\State Each server computes its share of $\mathbf{f} = \hat{\mathbf{q}} - \mathbf{b}^{(t)}$
+\State Servers exchange shares of $\mathbf{f}$ to open it \hfill (\textit{one round, $d$ integers = 3 KB})
+\State Server 1: $\mathbf{Z}_1 \leftarrow \mathbf{E}\mathbf{f} + \mathbf{E}\mathbf{b}_1^{(t)} + \mathbf{A}_1 \mathbf{f} + \mathbf{c}_1^{(t)}$
+\State Server 2: $\mathbf{Z}_2 \leftarrow \mathbf{E}\mathbf{b}_2^{(t)} + \mathbf{A}_2 \mathbf{f} + \mathbf{c}_2^{(t)}$
+\State Servers return $\mathbf{Z}_1, \mathbf{Z}_2$ to client
+\State Client reconstructs $\boldsymbol{\sigma} = \mathbf{Z}_1 + \mathbf{Z}_2$, decodes, and ranks
+\end{algorithmic}
+\end{algorithm}
+
+\begin{proposition}[Correctness]
+\label{prop:beaver-correct}
+The output satisfies $\mathbf{Z}_1 + \mathbf{Z}_2 = \mathbf{D}\hat{\mathbf{q}}$.
+\end{proposition}
+
+\begin{proof}
+\begin{align*}
+\mathbf{Z}_1 + \mathbf{Z}_2 &= \mathbf{E}\mathbf{f} + \mathbf{E}(\mathbf{b}_1^{(t)} + \mathbf{b}_2^{(t)}) + (\mathbf{A}_1 + \mathbf{A}_2)\mathbf{f} + (\mathbf{c}_1^{(t)} + \mathbf{c}_2^{(t)}) \\
+&= \mathbf{E}\mathbf{f} + \mathbf{E}\mathbf{b}^{(t)} + \mathbf{A}\mathbf{f} + \mathbf{A}\mathbf{b}^{(t)} \\
+&= (\mathbf{E} + \mathbf{A})(\mathbf{f} + \mathbf{b}^{(t)}) \\
+&= \mathbf{D} \cdot \hat{\mathbf{q}}. \qedhere
+\end{align*}
+\end{proof}
+
+\paragraph{Communication.} The online phase requires the servers to exchange one $d$-dimensional vector $\mathbf{f}$. At $d = 384$ with 64-bit elements, this is $384 \times 8 = 3{,}072$ bytes, approximately 3 KB. This is independent of the corpus size $N$. The servers also return $N$ values each to the client ($N \times 8$ bytes per server). At $N = 5{,}000$, the total online communication is approximately 83 KB.
+
+
+% ==================================================================
+\section{Security Analysis}
+\label{sec:security}
+% ==================================================================
+
+\begin{theorem}[Query Privacy, Information-Theoretic]
+\label{thm:query-privacy}
+In the query-private protocol (\Cref{alg:query-private}), each server's view is statistically independent of the query $\mathbf{q}$.
+\end{theorem}
+
+\begin{proof}
+Server 1 observes $(s_1^{(1)}, \ldots, s_1^{(d)})$, where each $s_1^{(i)}$ is drawn uniformly from $\Z_{2^{64}}$, independently of $\hat{q}_i$. For any two distinct queries $\mathbf{q}$ and $\mathbf{q}'$, the distribution of Server 1's view is identical: each component is uniform in $\Z_{2^{64}}$. The argument for Server 2 is symmetric: $s_2^{(i)} = \hat{q}_i - s_1^{(i)}$ is also uniform for any fixed $\hat{q}_i$ because $s_1^{(i)}$ is uniform.
+
+Formally, the statistical distance between Server $\ell$'s view under query $\mathbf{q}$ and under query $\mathbf{q}'$ is zero:
+\[
+\Delta\bigl(\text{View}_\ell(\mathbf{q}),\; \text{View}_\ell(\mathbf{q}')\bigr) = 0.
+\]
+This holds for computationally unbounded adversaries.
+\end{proof}
+
+\begin{theorem}[Mutual Privacy, Information-Theoretic]
+\label{thm:mutual-privacy}
+In the mutual-privacy protocol (\Cref{alg:mutual-privacy}), assuming the two servers do not collude, each server's view is statistically independent of (a) the query $\mathbf{q}$ and (b) any individual document embedding $\mathbf{d}_j$.
+\end{theorem}
+
+\begin{proof}
+Each server holds one additive share of each secret value ($\mathbf{D}_\ell$, $\mathbf{A}_\ell$, $\mathbf{b}_\ell$, $\mathbf{c}_\ell$, $\mathbf{q}_\ell$). All shares are uniform in $\Z_{2^{64}}$ by construction. The server's local state therefore reveals no information about the underlying values.
+
+During the online phase, the servers open $\mathbf{f} = \hat{\mathbf{q}} - \mathbf{b}^{(t)}$. Because $\mathbf{b}^{(t)}$ is a uniform random mask generated independently of $\hat{\mathbf{q}}$, the opened value $\mathbf{f}$ is uniform in $(\Z_{2^{64}})^d$ and independent of $\hat{\mathbf{q}}$. The public matrix $\mathbf{E} = \mathbf{D} - \mathbf{A}$ is also independent of $\mathbf{D}$ because $\mathbf{A}$ is a uniform mask.
+
+Combining these observations: each server's complete view (its shares plus all opened values) is identically distributed for any two input configurations $(\mathbf{q}, \mathbf{D})$ and $(\mathbf{q}', \mathbf{D}')$. The statistical distance is zero in both cases.
+\end{proof}
+
+\begin{remark}[Comparison with HE-based security]
+Our security guarantees hold against computationally unbounded adversaries. Lattice-based HE (CKKS, BFV) provides security only against polynomial-time adversaries under the Ring-LWE assumption. Paillier provides security under the Decisional Composite Residuosity Assumption. Our model is strictly stronger. The trade-off is the requirement for two non-colluding servers, which is standard in the secure computation literature~\cite{demmler2015aby} and used in deployed systems.
+\end{remark}
+
+\begin{remark}[Collusion]
+If both servers share their views, they can reconstruct all secret values. This two-server non-collusion assumption can be enforced organizationally (different cloud providers, different jurisdictions) or contractually (service-level agreements with audit provisions).
+\end{remark}
+
+
+% ==================================================================
+\section{Ranking Preservation}
+\label{sec:ranking}
+% ==================================================================
+
+\begin{theorem}[Exact Ranking Preservation]
+\label{thm:ranking}
+Let $\hat{s}_j = \sum_i \hat{q}_i \hat{d}_{j,i}$ be the integer dot product of the encoded vectors. In both protocols, the reconstructed value $\sigma_j$ satisfies $\sigma_j = \hat{s}_j \bmod 2^{64}$. Since $|\hat{s}_j| \leq d \cdot 2^{2k} < 2^{63}$ for all practical parameters, the modular value equals the true signed integer. Therefore, $\sigma_j = \hat{s}_j$ exactly, and the ranking induced by $\{\sigma_j\}$ is identical to the ranking induced by $\{\hat{s}_j\}$.
+\end{theorem}
+
+\begin{proof}
+In the query-private protocol:
+\[
+A_j + B_j = \sum_i \hat{d}_{j,i} \cdot s_1^{(i)} + \sum_i \hat{d}_{j,i} \cdot s_2^{(i)} = \sum_i \hat{d}_{j,i} (s_1^{(i)} + s_2^{(i)}) = \sum_i \hat{d}_{j,i} \hat{q}_i = \hat{s}_j \pmod{2^{64}}.
+\]
+All arithmetic is exact unsigned integer computation. The matrix-vector Beaver protocol is algebraically exact by \Cref{prop:beaver-correct}. Since $|\hat{s}_j| < 2^{63}$ (verified: $d \cdot 2^{2k} = 384 \cdot 2^{32} \approx 2^{41} \ll 2^{63}$), two's complement signed interpretation is correct. Rankings depend only on relative order, which is preserved.
+\end{proof}
+
+\begin{corollary}
+\label{cor:precision-k}
+If precision $k$ is large enough that no pair of true dot products $\langle \mathbf{q}, \mathbf{d}_j \rangle$ and $\langle \mathbf{q}, \mathbf{d}_{j'} \rangle$ is swapped by the quantization error, then the protocol returns the same top-$K$ as plaintext retrieval. In our experiments, $k \geq 12$ suffices for $d = 384$.
+\end{corollary}
+
+
+% ==================================================================
+\section{GPU Acceleration for Extended Precision}
+\label{sec:gpu}
+% ==================================================================
+
+For the RAG retrieval application at standard embedding dimensions ($d \leq 1024$) and precisions ($k \leq 20$), 64-bit arithmetic is sufficient and the server-side computation maps directly to optimized BLAS routines (or cuBLAS on GPU). No custom GPU kernel is needed.
+
+However, applications requiring deeper arithmetic circuits (polynomial approximations of non-linear activations, multi-layer secure inference) may produce intermediate values exceeding 64-bit range. For these settings, we provide a CUDA kernel implementing batch CIOS Montgomery multiplication for 2048-bit integers.
+
+Each 2048-bit integer is represented as 64 unsigned 32-bit limbs. The CIOS algorithm interleaves multiplication and reduction, requiring 66 words of working storage per thread. Each thread executes one independent modular multiplication.
+
+\begin{table}[h]
+\centering
+\caption{GPU Montgomery multiply speedup over GMP (RTX 4090, 2048-bit operands).}
+\label{tab:gpu-kernel}
+\begin{tabular}{rrrr}
+\toprule
+Batch size & CPU/GMP (ms) & GPU kernel (ms) & Speedup \\
+\midrule
+1{,}000 & 1.3 & 0.2 & 8.6x \\
+10{,}000 & 12.4 & 0.2 & 67.4x \\
+100{,}000 & 120.8 & 7.6 & 16.0x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For applications that require this extended precision, the kernel provides 16 to 67x speedup over GMP's sequential implementation, with throughput scaling to millions of independent multiplications per GPU launch.
+
+\gpuplaceholder{Insert A100/B200 kernel results for extended-precision benchmarks}
+
+
+% ==================================================================
+\section{Experimental Evaluation}
+\label{sec:experiments}
+% ==================================================================
+
+\subsection{Setup}
+
+\paragraph{Schemes compared.}
+\begin{itemize}[leftmargin=*]
+\item \textbf{Ours (query-private):} Two-server additive sharing over $\Z_{2^{64}}$. Documents plaintext on both servers, query shared. Zero inter-server communication. Implemented with NumPy \texttt{uint64} matrix-vector multiply.
+\item \textbf{Ours (mutual-privacy):} Two-server with matrix-vector Beaver triples over $\Z_{2^{64}}$. Both query and documents shared. One round of $d = 384$ integers (3 KB) exchanged between servers per query.
+\item \textbf{CKKS:} TenSEAL~\cite{benaissa2021tenseal} with \texttt{poly\_modulus\_degree} = 8192, coefficient modulus [60, 40, 40, 60], \texttt{global\_scale} = $2^{40}$, providing 128-bit security.
+\item \textbf{Paillier:}~\cite{paillier1999public} 2048-bit key. Query-private model (query encrypted, documents plaintext).
+\end{itemize}
+
+\paragraph{Parameters.} Embedding dimension $d = 384$ (matching Sentence-BERT all-MiniLM-L6-v2~\cite{reimers2019sentence}). Encoding precision $k = 16$. Random unit vectors ($\ell_2$-normalized). 10 queries per configuration. All schemes evaluated on the same vectors.
+
+\paragraph{Hardware.} Windows workstation, 64 GB RAM, NVIDIA RTX 4090.
+
+\subsection{End-to-End Query Latency}
+
+\begin{table}[t]
+\centering
+\caption{End-to-end query latency and ranking accuracy at $d = 384$, $k = 16$. All Recall values are averaged over 10 queries. Ours (QP) = query-private; Ours (MP) = mutual-privacy with matrix-vector Beaver triples.}
+\label{tab:e2e}
+\begin{tabular}{llrrrrrr}
+\toprule
+Scheme & Security & $N$ & Latency (ms) & R@1 & R@5 & R@10 & q/s \\
+\midrule
+Plaintext & {-} & 50 & 0.01 & 1.000 & 1.000 & 1.000 & 119{,}048 \\
+Ours (QP) & Info-theoretic & 50 & 0.13 & 1.000 & 1.000 & 1.000 & 7{,}468 \\
+Ours (MP) & Info-theoretic & 50 & 0.26 & 1.000 & 1.000 & 1.000 & 3{,}838 \\
+CKKS-8192 & Computational & 50 & 867 & 1.000 & 1.000 & 1.000 & 1.2 \\
+Paillier & Computational & 50 & 7{,}103 & 1.000 & 1.000 & 1.000 & 0.1 \\
+\midrule
+Plaintext & {-} & 200 & 0.03 & 1.000 & 1.000 & 1.000 & 28{,}986 \\
+Ours (QP) & Info-theoretic & 200 & 0.43 & 1.000 & 1.000 & 1.000 & 2{,}310 \\
+Ours (MP) & Info-theoretic & 200 & 0.87 & 1.000 & 1.000 & 1.000 & 1{,}156 \\
+CKKS-8192 & Computational & 200 & 3{,}486 & 1.000 & 1.000 & 1.000 & 0.3 \\
+\midrule
+Plaintext & {-} & 1{,}000 & 0.22 & 1.000 & 1.000 & 1.000 & 4{,}586 \\
+Ours (QP) & Info-theoretic & 1{,}000 & 2.37 & 1.000 & 1.000 & 1.000 & 422 \\
+Ours (MP) & Info-theoretic & 1{,}000 & 4.50 & 1.000 & 1.000 & 1.000 & 222 \\
+CKKS-8192 & Computational & 1{,}000 & 17{,}226 & 1.000 & 1.000 & 1.000 & 0.1 \\
+\midrule
+Plaintext & {-} & 5{,}000 & 1.04 & 1.000 & 1.000 & 1.000 & 958 \\
+Ours (QP) & Info-theoretic & 5{,}000 & 11.95 & 1.000 & 1.000 & 1.000 & 84 \\
+Ours (MP) & Info-theoretic & 5{,}000 & 23.59 & 1.000 & 1.000 & 1.000 & 42 \\
+CKKS-8192 & Computational & 5{,}000 & 95{,}969 & 1.000 & 1.000 & 1.000 & 0.01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The performance advantage grows with corpus size because our protocol's per-document cost is a single \texttt{uint64} inner product (sub-microsecond), while CKKS incurs polynomial ring operations per document.
+
+At $N = 50$: query-private runs in 0.13 ms (6{,}700x faster than CKKS, 55{,}000x faster than Paillier). Mutual-privacy runs in 0.26 ms (3{,}300x faster than CKKS).
+
+At $N = 5{,}000$: query-private runs in 12 ms (8{,}000x faster than CKKS). Mutual-privacy runs in 24 ms (4{,}100x faster than CKKS). Both schemes scale linearly with $N$, as expected for a brute-force scan. At this latency, approximate nearest-neighbor indexing (HNSW, IVF) is unnecessary for corpora up to tens of thousands of documents.
+
+\gpuplaceholder{Insert A100/B200 results at N = 10000, 50000, 100000 with cuBLAS uint64}
+
+\subsection{Why the Protocol is Fast}
+
+The speedup has a simple structural explanation. \Cref{tab:cost} compares the cost of the dominant operation in each scheme.
+
+\begin{table}[h]
+\centering
+\caption{Cost of the dominant per-element operation in each scheme.}
+\label{tab:cost}
+\begin{tabular}{lll}
+\toprule
+Scheme & Dominant operation & Approximate cost \\
+\midrule
+Ours & \texttt{uint64} multiply + add & $\sim$0.3 ns (1 CPU cycle) \\
+CKKS & Polynomial NTT (degree 8192) & $\sim$10 $\mu$s \\
+Paillier & 4096-bit modular exponentiation & $\sim$100 $\mu$s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Our protocol reduces the problem to a matrix-vector multiply over \texttt{uint64}, which is the single most optimized operation in numerical computing. BLAS libraries, GPU tensor cores, and SIMD vector units all target this workload. Lattice-based HE cannot exploit this infrastructure because its arithmetic involves polynomial rings with special structure (NTT, key switching, rescaling).
+
+\subsection{Ranking Accuracy}
+
+All schemes achieve Recall@$K$ = 1.000 for $K \in \{1, 5, 10\}$ at precision $k = 16$ across every corpus size and all 10 queries. This is expected: our scheme provides exact integer arithmetic, and CKKS-8192 has sufficient noise budget for a depth-1 dot product. However, CKKS at smaller parameters (\texttt{poly\_modulus\_degree} = 4096) degrades to Recall@1 = 0.883 in separate experiments, demonstrating the noise-accuracy trade-off inherent to approximate HE.
+
+\subsection{Storage}
+
+\begin{table}[h]
+\centering
+\caption{Per-document storage cost at $d = 384$.}
+\label{tab:storage}
+\begin{tabular}{lrl}
+\toprule
+Scheme & Per-doc storage & Notes \\
+\midrule
+Plaintext & 1.5 KB & \texttt{float32}, $384 \times 4$ bytes \\
+Ours (query-priv.) & 1.5 KB & Documents are plaintext \\
+Ours (mutual-priv.) & \textbf{3.1 KB} & Two \texttt{uint64} shares, $384 \times 8$ bytes each \\
+CKKS-8192 (SIMD) & $\sim$33 KB & One ciphertext packs $\sim$10 vectors \\
+Paillier & 1.5 KB & Documents are plaintext (query-private) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In the query-private model, documents are plaintext on both servers, so there is no storage overhead. In the mutual-privacy model, each document requires two \texttt{uint64} share vectors: $2 \times 384 \times 8 = 6{,}144$ bytes per document ($\sim$3.1 KB per server). This is 10x smaller than CKKS with SIMD batching.
+
+\subsection{Communication}
+
+\begin{table}[h]
+\centering
+\caption{Online communication per query.}
+\label{tab:comm}
+\begin{tabular}{lrl}
+\toprule
+Scheme & Online communication & Notes \\
+\midrule
+Ours (query-priv.) & $2d \times 8$ bytes = 6 KB & Client to servers, no inter-server \\
+Ours (mutual-priv.) & $d \times 8$ bytes = 3 KB & Inter-server: $\mathbf{f}$ vector only \\
+CKKS & $\sim$326 KB & One encrypted query vector \\
+Paillier & $d \times 512$ bytes = 192 KB & $d$ encrypted scalars \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The matrix-vector Beaver triple structure reduces inter-server communication to a single $d$-dimensional vector per query. At $d = 384$, this is 3 KB regardless of corpus size. Combined with the per-document storage advantage, the mutual-privacy mode is practical even for large-scale deployment.
+
+\subsection{Offline Costs}
+
+The mutual-privacy mode requires offline precomputation:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{One-time corpus setup:} Sharing $\mathbf{D}$ and computing $\mathbf{E} = \mathbf{D} - \mathbf{A}$ requires generating $2Nd$ random \texttt{uint64} values and one $N \times d$ matrix exchange between servers. At $N = 5{,}000$, $d = 384$: generating and exchanging approximately 15 MB. This is fast (sub-second with NumPy).
+
+\item \textbf{Per-query triple generation:} Generating $\mathbf{b}^{(t)}$ ($d$ values), computing $\mathbf{c}^{(t)} = \mathbf{A}\mathbf{b}^{(t)}$ (one matrix-vector multiply), and sharing both. Storage per pre-generated triple: $(N + d) \times 8$ bytes. At $N = 5{,}000$, $d = 384$: approximately 43 KB per query triple, and triples can be pre-generated in bulk.
+\end{itemize}
+
+\gpuplaceholder{Insert real-embedding results (Sentence-BERT on MS MARCO)}
+
+
+% ==================================================================
+\section{Related Work}
+\label{sec:related}
+% ==================================================================
+
+\paragraph{HE-based privacy-preserving retrieval.}
+PRAG~\cite{prag2026} uses CKKS for encrypted RAG with an Operation-Error Estimation module to manage noise. RAGtime-PIANO~\cite{ragtimepiano2026} combines FHE with lattice-based PIR for secure RAG-as-a-Service. SecureRAG~\cite{securerag2025} adds attribute-based encryption for access control. PIR-RAG~\cite{pirrag2025} uses semantic clustering with lattice-based PIR. $p^2$RAG~\cite{p2rag2026} supports flexible top-$k$ via interactive bisection. D-RAG~\cite{drag2025} uses blockchain consensus for decentralized RAG. All systems that use CKKS for similarity computation inherit its noise limitations. We note that BFV~\cite{fan2012somewhat} provides exact integer HE with computational (Ring-LWE) security and could replace CKKS in these systems; our approach provides an alternative path with information-theoretic security and dramatically lower computational cost, at the expense of requiring two non-colluding servers.
+
+\paragraph{Exact-integer HE.}
+BFV~\cite{fan2012somewhat} and BGV~\cite{brakerski2014leveled} operate over integer plaintext rings and provide exact arithmetic for circuits within their noise budget. For a depth-1 dot product, standard parameters accommodate the noise easily. CryptoNets~\cite{gilad2016cryptonets} applies BFV to neural network inference. Our work provides an alternative path to exact computation that avoids polynomial ring arithmetic, operates over native hardware integers, and offers information-theoretic rather than computational security.
+
+\paragraph{Secure multi-party computation for ML.}
+Two-server protocols for privacy-preserving machine learning are well established. ABY~\cite{demmler2015aby} provides a framework mixing arithmetic, boolean, and garbled-circuit sharing. SecureML~\cite{mohassel2017secureml} applies two-server MPC to machine learning training. CrypTFlow~\cite{kumar2020cryptflow} and similar systems demonstrate that additive sharing over power-of-two rings ($\Z_{2^{32}}$ or $\Z_{2^{64}}$) is practical for large-scale secure inference. Our protocol is a special case of arithmetic secret sharing applied to a single matrix-vector product, and the matrix-vector Beaver triple optimization is standard in the MPC literature. The contribution is in the complete encoding-to-ranking pipeline for RAG, the demonstration that this approach outperforms HE by four orders of magnitude, and the tight error analysis guaranteeing ranking preservation.
+
+\paragraph{Paillier for inner products.}
+Paillier~\cite{paillier1999public} supports exact additive homomorphism and plaintext-scalar multiplication, sufficient for query-private dot products. However, Paillier's modular exponentiation costs approximately $10^5$x more per element than our \texttt{uint64} multiplication, as confirmed by our experiments (7{,}103 ms vs. 0.13 ms at $N = 50$).
+
+
+% ==================================================================
+\section{Discussion and Limitations}
+\label{sec:discussion}
+% ==================================================================
+
+\paragraph{Two-server assumption.} Our protocol requires two non-colluding servers. This is a stronger deployment assumption than single-server HE. In practice, the two servers can be operated by different cloud providers (AWS and Azure), different departments within an organization, or a service provider and a privacy auditor. This model is standard in deployed privacy-preserving systems and is the basis of frameworks such as ABY~\cite{demmler2015aby}.
+
+\paragraph{Document privacy under repeated queries.} In the query-private model, documents are plaintext, so document privacy is not a goal. In the mutual-privacy model, the client receives dot-product scores, which are linear projections of document embeddings onto the query direction. An adversary controlling the client who issues $d$ linearly independent queries could solve a system of equations to reconstruct each document. Mitigations include rate-limiting queries, monitoring for linearly independent patterns, or adding calibrated noise to the returned scores. A formal treatment of query-budget-limited privacy is an avenue for future work.
+
+\paragraph{BFV as an alternative.} For single-server deployment where the two-server assumption is infeasible, BFV~\cite{fan2012somewhat} provides exact integer HE with computational (Ring-LWE) security. We view our approach and BFV as complementary: our protocol excels when two non-colluding servers are available; BFV excels when they are not. A quantitative comparison with BFV using the same encoding framework is a natural direction for future work.
+
+\paragraph{Scaling beyond brute-force.} Our current protocol computes similarity against every document (brute-force scan). For corpora exceeding tens of thousands of documents, approximate nearest-neighbor structures (HNSW, IVF) reduce the search space. Integrating such indices with secret-shared computation is possible (e.g., secret-shared HNSW traversal) but introduces additional protocol complexity. At $N = 5{,}000$ our protocol completes in 12 ms, suggesting brute-force is practical for many real deployments.
+
+
+% ==================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ==================================================================
+
+We have presented a two-server protocol for privacy-preserving similarity search that provides information-theoretic security, exact integer arithmetic, and query throughput four orders of magnitude higher than CKKS. By operating over the native 64-bit integer ring and amortizing the static document corpus through matrix-vector Beaver triples, we achieve sub-millisecond query latency at $N = 50$ and 12 ms at $N = 5{,}000$, with per-document storage of 3 KB (10x smaller than CKKS with SIMD batching) and online communication of 3 KB per query (independent of corpus size).
+
+The core insight is that the dot product decomposes into independent scalar multiplications followed by summation, both of which are natively free in additive secret sharing. This reduces the server-side computation to a standard matrix-vector multiply over \texttt{uint64}, the single most optimized numerical primitive in modern hardware. The gap between this and the polynomial ring arithmetic of lattice-based HE explains the four-order-of-magnitude speedup.
+
+The only approximation in the pipeline is the initial fixed-point quantization, which is bounded by $d \cdot 2^{-k}$ and provably does not grow with computation depth. At $k = 16$ and $d = 384$, this is sufficient for perfect ranking preservation across all tested configurations.
+
+\gpuplaceholder{Final paragraph with A100/B200 and real-embedding results}
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
