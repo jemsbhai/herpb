@@ -136,3 +136,75 @@ exactly how deep their circuit can go before choosing key parameters.
 - Raw data: experiments/exp_003_add_depth/results_raw.csv
 - Summary: experiments/exp_003_add_depth/summary.json
 - Figures: figures/fig9_add_depth_boundary.pdf, fig10_add_depth_heatmap.pdf
+
+
+---
+
+## EXP-004: Privacy-Preserving RAG Similarity Benchmark
+
+**Date:** 2026-06-04
+**Researcher:** Muntaser
+**Type:** computational
+**Status:** planned
+
+### Hypothesis
+
+RPB/MRPB encrypted dot product produces zero encryption error (only
+one-time quantization error bounded by d·2^{-k}), preserving document
+rankings perfectly.  In contrast, CKKS introduces noise that grows with
+computation and can corrupt rankings.  For RAG similarity computation,
+RPB/MRPB provide guaranteed exact retrieval while CKKS does not.
+
+### Independent Variables
+- Encoding precision k: 8, 10, 12, 14, 16, 18, 20, 24
+- Embedding dimension: 4, 8, 16, 32, 64, 128, 256, 384, 768
+- Number of documents: 100, 500, 1000, 2000, 5000, 10000, 20000, 50000
+- Encryption scheme: RPB, MRPB, CKKS (TenSEAL)
+- CKKS parameters: poly_modulus_degree, coeff_mod, global_scale
+- Homomorphic depth: 1, 2, 4, 8, 16 (for noise accumulation test)
+
+### Dependent Variables / Metrics
+- Encryption error: |encrypted_dot − encoded_dot| (should be 0 for RPB/MRPB)
+- Quantization error: |true_dot − encrypted_dot|
+- Analytical bound: d·(2M·ε + ε²) where ε = 2^{-(k+1)}
+- Recall@K for K ∈ {1, 5, 10, 20, 50}: fraction of true top-K in encrypted top-K
+- Per-operation timing: encode, encrypt, dot_product, decrypt (seconds)
+- Ciphertext size (bytes)
+- Query throughput (queries/second) at various corpus sizes
+
+### Control Conditions
+- Random unit vectors (controlled, reproducible via seed=2026)
+- All schemes operate on identical input vectors
+- CKKS uses standard 128-bit security parameters
+- RPB/MRPB use 2048-bit keys (standard RSA security)
+
+### Protocol
+1. Phase 1: Correctness — 14,400 RPB + 1,000 MRPB trials across precision × dimension
+2. Phase 2: Error analysis — bound validation (500 trials/config) + depth invariance test
+3. Phase 3: Ranking — 100 queries × 1000 docs × 4 precisions × 3 dims (RPB) + MRPB validation
+4. Phase 4: CKKS comparison — same ranking task with TenSEAL, multiple parameter configs
+5. Phase 5: Scalability — query time vs corpus size (100–50K docs)
+6. Phase 6: Performance — per-operation timing breakdown
+7. Phase 7: Real embeddings — sentence-transformer (all-MiniLM-L6-v2) on MS MARCO subset
+
+### Environment
+- **Hardware:** NVIDIA A100 (80GB), 40 hours compute budget
+- **Software:** Python 3.12, gmpy2 2.3.0, TenSEAL, sentence-transformers
+- **Git commit:** TBD (commit before execution)
+- **Config file:** configs/exp_004_rag_benchmark.yaml
+- **Seeds:** 2026 (base), +100/+200/+300/+400/+500 per phase
+
+### Results
+[To be filled after experiment completes]
+
+### Observations
+[To be filled after experiment completes]
+
+### Interpretation
+[To be filled after experiment completes]
+
+### Artifacts
+- Script: scripts/run_rag_benchmark.py
+- Config: configs/exp_004_rag_benchmark.yaml
+- Output directory: experiments/exp_004_rag_benchmark/
+- Figures: fig11–fig17 (PDF+PNG)

@@ -1,0 +1,148 @@
+# EXP-004: Privacy-Preserving RAG Similarity Benchmark
+# =====================================================
+# Comprehensive benchmark comparing RPB/MRPB vs CKKS for encrypted
+# similarity computation in RAG pipelines.
+#
+# Target: IEEE ICTAI 2026 paper — every number in the paper traces here.
+#
+# Estimated runtime: ~15-25 hours on A100 instance (40h budget)
+# Primary bottleneck: MRPB operations (rational reconstruction)
+
+experiment:
+  id: "EXP-004"
+  name: "Privacy-Preserving RAG Similarity Benchmark"
+  description: >
+    End-to-end benchmark of RPB/MRPB encrypted dot product for similarity
+    computation in RAG, with direct CKKS comparison.  Validates zero
+    encryption error, bounded quantization error, perfect ranking
+    preservation, and provides performance profiling.
+  seed: 2026
+  output_dir: "experiments/exp_004_rag_benchmark"
+
+# ── Phase 1: Correctness at scale ──────────────────────────────────
+phase1_correctness:
+  description: >
+    Verify encrypted dot product = plaintext dot product (zero encryption
+    error) across precision levels and dimensions.
+  precision_bits: [8, 10, 12, 14, 16, 18, 20, 24]
+  dimensions: [4, 8, 16, 32, 64, 128, 256, 384, 768]
+  trials_per_config: 200
+  schemes: ["rpb", "mrpb"]
+  mrpb_key_bits: 2048
+  # Estimated time:
+  #   RPB:  8×9×200 = 14,400 trials × ~20ms ≈ 5 min
+  #   MRPB: 8×9×200 = 14,400 trials × ~200ms ≈ 48 min (only 384-dim)
+  #   MRPB subset: 4 precisions × 5 dims × 50 trials = 1,000 trials
+
+  # For MRPB, use subset to stay within time budget
+  mrpb_precision_bits: [8, 12, 16, 20]
+  mrpb_dimensions: [4, 16, 64, 256, 384]
+  mrpb_trials_per_config: 50
+
+# ── Phase 2: Error analysis ────────────────────────────────────────
+phase2_error:
+  description: >
+    Empirically validate analytical error bounds.  Show that the
+    quantization error is (a) always within the bound, (b) the bound
+    is tight, and (c) the error does NOT grow with homomorphic depth.
+  precision_bits: [8, 10, 12, 14, 16, 18, 20, 24]
+  dimensions: [4, 32, 128, 384, 768]
+  trials_per_config: 500
+  # Also measure error after chained operations (depth 1, 2, 4, 8)
+  # to demonstrate zero noise accumulation
+  homomorphic_depths: [1, 2, 4, 8, 16]
+  depth_trials: 100
+
+# ── Phase 3: Ranking preservation (core RAG claim) ─────────────────
+phase3_ranking:
+  description: >
+    The most important phase.  Retrieve top-k documents from an encrypted
+    corpus and verify rankings match plaintext exactly.
+  # Synthetic embeddings (controlled)
+  synthetic:
+    dimensions: [128, 384, 768]
+    num_queries: 100
+    num_documents: 1000
+    precision_bits: [10, 12, 16, 20]
+    top_k: [1, 5, 10, 20, 50]
+    schemes: ["rpb"]  # RPB for bulk, MRPB for validation
+
+  # MRPB validation subset
+  mrpb_validation:
+    dimensions: [128, 384]
+    num_queries: 20
+    num_documents: 200
+    precision_bits: [12, 16]
+    top_k: [1, 5, 10, 20, 50]
+
+  # Real embeddings (if sentence-transformers available)
+  real_embeddings:
+    enabled: true
+    model_name: "all-MiniLM-L6-v2"  # 384-dim
+    dataset: "ms_marco_subset"       # First 10K passages
+    num_passages: 10000
+    num_queries: 100
+    precision_bits: [12, 16, 20]
+    top_k: [1, 5, 10, 20, 50, 100]
+
+# ── Phase 4: CKKS comparison ──────────────────────────────────────
+phase4_ckks:
+  description: >
+    Direct comparison with TenSEAL CKKS on the same tasks.
+    Show noise-induced ranking errors that RPB/MRPB avoid.
+  enabled: true  # Set false if tenseal not available
+  poly_modulus_degrees: [4096, 8192, 16384]
+  coeff_mod_configs:
+    # name: [bit sizes]
+    shallow: [60, 40, 60]         # 1 mult level
+    medium: [60, 40, 40, 60]     # 2 mult levels
+    deep: [60, 40, 40, 40, 60]   # 3 mult levels
+  global_scales: [30, 40, 50]     # 2^scale
+  dimensions: [128, 384, 768]
+  num_queries: 100
+  num_documents: 1000
+  precision_bits_for_comparison: [12, 16, 20]  # RPB/MRPB precisions
+  top_k: [1, 5, 10, 20, 50]
+
+# ── Phase 5: Scalability ──────────────────────────────────────────
+phase5_scalability:
+  description: >
+    Measure throughput as corpus size grows.
+    Fixed config: k=16, dim=384, 2048-bit MRPB key.
+  precision_bits: 16
+  dimension: 384
+  num_queries: 20
+  document_counts: [100, 500, 1000, 2000, 5000, 10000]
+  schemes: ["rpb", "mrpb"]
+  mrpb_key_bits: 2048
+  # RPB at 50K docs is feasible; MRPB caps at 10K
+  rpb_extra_counts: [20000, 50000]
+  ckks_counts: [100, 500, 1000, 2000, 5000, 10000, 20000, 50000]
+
+# ── Phase 6: Performance profiling ─────────────────────────────────
+phase6_performance:
+  description: >
+    Breakdown of per-operation timing: encode, encrypt, dot_product,
+    decrypt.  Critical for the paper's performance table.
+  dimensions: [32, 64, 128, 256, 384, 768]
+  precision_bits: [12, 16, 20]
+  trials: 50
+  schemes: ["rpb", "mrpb"]
+  mrpb_key_bits: 2048
+  # Also measure CKKS per-operation timing
+  ckks_enabled: true
+
+# ── Figure generation ──────────────────────────────────────────────
+figures:
+  output_dir: "figures"
+  format: ["pdf", "png"]
+  dpi: 300
+  # Planned figures:
+  # fig11: Quantization error vs precision (RPB/MRPB vs CKKS noise)
+  # fig12: Ranking recall@k vs precision for RPB/MRPB (should be 1.0)
+  # fig13: CKKS recall@k degradation vs RPB/MRPB (headline figure)
+  # fig14: Per-operation timing breakdown by dimension
+  # fig15: Scalability: throughput vs corpus size
+  # fig16: Error after depth-d homomorphic ops (flat for us, growing for CKKS)
+  # fig17: Real embeddings retrieval accuracy (if available)
+  # fig18: MRPB key size vs supported dimension (plaintext space analysis)
