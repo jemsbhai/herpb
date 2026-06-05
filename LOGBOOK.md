@@ -208,3 +208,83 @@ RPB/MRPB provide guaranteed exact retrieval while CKKS does not.
 - Config: configs/exp_004_rag_benchmark.yaml
 - Output directory: experiments/exp_004_rag_benchmark/
 - Figures: fig11–fig17 (PDF+PNG)
+
+
+---
+
+## EXP-008: Secure Two-Server Comparison (2048-bit)
+**Date:** 2026-06-05
+**Status:** COMPLETED
+
+### Objective
+First benchmark of the corrected two-server additive secret sharing scheme after pivoting from the broken RPB/MRPB construction. Compare query-private and mutual-privacy modes against CKKS and Paillier at dim=384.
+
+### Key Results
+- Query-private: 7 ms (125x faster than CKKS)
+- Mutual-privacy: 87 ms (10x faster than CKKS)
+- All schemes: Recall@1 = 1.000
+- Security: information-theoretic (stronger than CKKS computational)
+
+### Artifacts
+- Script: scripts/run_secure_comparison.py
+- Output: experiments/exp_008_secure_comparison/
+- Figures: fig29-fig31
+
+---
+
+## EXP-009: 64-bit Native Secret Sharing Comparison
+**Date:** 2026-06-05
+**Status:** COMPLETED
+
+### Objective
+Eliminate the "2048-bit hangover" from the RSA-era design. Replace gmpy2 2048-bit arithmetic with native uint64 numpy operations. Implement matrix-vector Beaver triples to reduce online communication from O(Nd) to O(d).
+
+### Key Results (dim=384, k=16)
+| Scheme | N=50 | N=1000 | N=5000 | vs CKKS |
+|--------|------|--------|--------|---------|
+| Ours (QP) | 0.13 ms | 2.4 ms | 12 ms | 6,700x faster |
+| Ours (MP) | 0.26 ms | 4.5 ms | 24 ms | 3,300x faster |
+| CKKS-8192 | 867 ms | 17,226 ms | 95,969 ms | baseline |
+| Paillier | 7,103 ms | N/A | N/A | 55,000x slower than QP |
+
+- All: Recall@1 = 1.000
+- Mutual-privacy storage: 3.1 KB/doc (10x smaller than CKKS 33 KB)
+- Online communication: 3 KB per query (independent of N)
+
+### Artifacts
+- Script: scripts/run_64bit_comparison.py
+- Output: experiments/exp_009_64bit_comparison/
+
+---
+
+## EXP-010: Comprehensive Server Benchmark (A100/B200)
+**Date:** 2026-06-05
+**Status:** PENDING (sent to collaborator)
+
+### Objective
+Full-scale benchmark on A100/B200 GPU server covering 8 phases:
+1. Correctness verification
+2. Query-private scaling: N = 100 to 1M
+3. Mutual-privacy scaling: N = 100 to 100K (matrix-vector Beaver)
+4. CKKS baseline: N = 50 to 5,000
+5. Paillier baseline: N = 50
+6. Real embeddings: MS MARCO + all-MiniLM-L6-v2, N up to 5,000
+7. Precision sweep: k = 8 to 24
+8. 2048-bit Montgomery GPU kernel (deep circuits extension)
+
+### Estimated Time
+2-4 hours on A100.
+
+### Setup
+```
+git clone https://github.com/jemsbhai/herpb.git
+cd herpb
+bash scripts/server_setup.sh
+python scripts/run_server_benchmark.py 2>&1 | tee exp010.log
+```
+
+### Artifacts
+- Setup: scripts/server_setup.sh
+- Script: scripts/run_server_benchmark.py
+- Output: experiments/exp_010_server/
+- Figures: fig_scaling, fig_precision, fig_real_embeddings
