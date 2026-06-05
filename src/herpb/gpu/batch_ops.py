@@ -7,12 +7,14 @@ Each A is a 2048-bit number (64 x uint32 limbs), s is a small scalar.
 Requires: cupy with CUDA support.
 """
 
+import time
 import numpy as np
 import cupy as cp
 import gmpy2
 from gmpy2 import mpz
 
-LIMBS = 64  # 2048 bits / 32 bits per limb
+LIMBS = 64        # 2048 bits / 32 bits per limb
+LIMB_BYTES = 256  # 64 limbs * 4 bytes
 
 
 # =====================================================================
@@ -144,37 +146,43 @@ _kernel = cp.RawKernel(_KERNEL_SRC, "mod_scalar_mul")
 
 
 # =====================================================================
-# Conversion: gmpy2.mpz <-> uint32 limb arrays
+# Fast conversion: gmpy2.mpz <-> uint32 limb arrays
+# Uses int.to_bytes / int.from_bytes instead of Python loops
 # =====================================================================
 
 def mpz_to_limbs(x: mpz, n_limbs: int = LIMBS) -> np.ndarray:
     """Convert non-negative gmpy2.mpz to little-endian uint32 limb array."""
-    limbs = np.zeros(n_limbs, dtype=np.uint32)
-    val = int(x)
-    for i in range(n_limbs):
-        limbs[i] = val & 0xFFFFFFFF
-        val >>= 32
-    return limbs
+    raw = int(x).to_bytes(n_limbs * 4, byteorder='little')
+    return np.frombuffer(raw, dtype=np.uint32).copy()
 
 
 def limbs_to_mpz(limbs: np.ndarray) -> mpz:
     """Convert little-endian uint32 limb array to gmpy2.mpz."""
-    result = 0
-    for i in range(len(limbs) - 1, -1, -1):
-        result = (result << 32) | int(limbs[i])
-    return gmpy2.mpz(result)
+    return gmpy2.mpz(int.from_bytes(limbs.tobytes(), byteorder='little'))
 
 
 def batch_mpz_to_limbs(values: list[mpz], n_limbs: int = LIMBS) -> np.ndarray:
-    """Convert list of mpz to 2D limb array (batch, n_limbs)."""
-    arr = np.zeros((len(values), n_limbs), dtype=np.uint32)
+    """Convert list of mpz to 2D limb array. Uses fast byte packing."""
+    n = len(values)
+    byte_len = n_limbs * 4
+    buf = bytearray(n * byte_len)
     for i, v in enumerate(values):
-        arr[i] = mpz_to_limbs(v, n_limbs)
-    return arr
+        buf[i * byte_len:(i + 1) * byte_len] = int(v).to_bytes(byte_len, byteorder='little')
+    return np.frombuffer(buf, dtype=np.uint32).reshape(n, n_limbs).copy()
+
+
+def batch_limbs_to_mpz(arr: np.ndarray) -> list[mpz]:
+    """Convert 2D limb array to list of mpz. Uses fast byte unpacking."""
+    raw = arr.tobytes()
+    row_bytes = arr.shape[1] * 4
+    return [
+        gmpy2.mpz(int.from_bytes(raw[i * row_bytes:(i + 1) * row_bytes], byteorder='little'))
+        for i in range(arr.shape[0])
+    ]
 
 
 # =====================================================================
-# Python wrapper
+# Python wrapper with timing breakdown
 # =====================================================================
 
 def batch_mod_scalar_mul(
@@ -191,15 +199,15 @@ def batch_mod_scalar_mul(
     if batch == 0:
         return []
 
-    # Separate signs
     abs_scalars = np.array([abs(s) for s in scalars], dtype=np.uint32)
     signs = [s < 0 for s in scalars]
 
-    # Convert to limb arrays and send to GPU
-    A_limbs = batch_mpz_to_limbs(A_values)          # (batch, 64) uint32
-    n_limbs = mpz_to_limbs(n_mod)                    # (64,) uint32
+    # Convert to limb arrays
+    A_limbs = batch_mpz_to_limbs(A_values)
+    n_limbs = mpz_to_limbs(n_mod)
 
-    d_A = cp.asarray(A_limbs.ravel())                # flatten for kernel
+    # Send to GPU
+    d_A = cp.asarray(A_limbs.ravel())
     d_scalars = cp.asarray(abs_scalars)
     d_n = cp.asarray(n_limbs)
     d_out = cp.zeros(batch * LIMBS, dtype=cp.uint32)
@@ -211,19 +219,81 @@ def batch_mod_scalar_mul(
         (d_A, d_scalars, d_n, d_out, np.int32(batch)),
     )
 
-    # Transfer back and reshape
+    # Transfer back
     out_flat = cp.asnumpy(d_out)
     out_limbs = out_flat.reshape(batch, LIMBS)
 
-    # Convert to mpz + handle signs
-    results = []
+    # Convert back to mpz + handle signs
+    results = batch_limbs_to_mpz(out_limbs)
     for i in range(batch):
-        val = limbs_to_mpz(out_limbs[i])
-        if signs[i] and val != 0:
-            val = n_mod - val
-        results.append(val)
+        if signs[i] and results[i] != 0:
+            results[i] = n_mod - results[i]
 
     return results
+
+
+def batch_mod_scalar_mul_timed(
+    A_values: list[mpz],
+    scalars: list[int],
+    n_mod: mpz,
+    threads_per_block: int = 256,
+) -> tuple[list[mpz], dict]:
+    """Same as batch_mod_scalar_mul but returns per-phase timing breakdown."""
+    batch = len(A_values)
+    if batch == 0:
+        return [], {}
+
+    abs_scalars = np.array([abs(s) for s in scalars], dtype=np.uint32)
+    signs = [s < 0 for s in scalars]
+
+    # Phase 1: mpz -> limbs
+    t0 = time.perf_counter()
+    A_limbs = batch_mpz_to_limbs(A_values)
+    n_limbs = mpz_to_limbs(n_mod)
+    t_convert_in = time.perf_counter() - t0
+
+    # Phase 2: CPU -> GPU transfer
+    t0 = time.perf_counter()
+    d_A = cp.asarray(A_limbs.ravel())
+    d_scalars = cp.asarray(abs_scalars)
+    d_n = cp.asarray(n_limbs)
+    d_out = cp.zeros(batch * LIMBS, dtype=cp.uint32)
+    cp.cuda.Stream.null.synchronize()
+    t_transfer_in = time.perf_counter() - t0
+
+    # Phase 3: Kernel execution
+    t0 = time.perf_counter()
+    blocks = (batch + threads_per_block - 1) // threads_per_block
+    _kernel(
+        (blocks,), (threads_per_block,),
+        (d_A, d_scalars, d_n, d_out, np.int32(batch)),
+    )
+    cp.cuda.Stream.null.synchronize()
+    t_kernel = time.perf_counter() - t0
+
+    # Phase 4: GPU -> CPU transfer
+    t0 = time.perf_counter()
+    out_flat = cp.asnumpy(d_out)
+    out_limbs = out_flat.reshape(batch, LIMBS)
+    t_transfer_out = time.perf_counter() - t0
+
+    # Phase 5: limbs -> mpz
+    t0 = time.perf_counter()
+    results = batch_limbs_to_mpz(out_limbs)
+    for i in range(batch):
+        if signs[i] and results[i] != 0:
+            results[i] = n_mod - results[i]
+    t_convert_out = time.perf_counter() - t0
+
+    timing = {
+        "convert_in_ms": t_convert_in * 1000,
+        "transfer_in_ms": t_transfer_in * 1000,
+        "kernel_ms": t_kernel * 1000,
+        "transfer_out_ms": t_transfer_out * 1000,
+        "convert_out_ms": t_convert_out * 1000,
+        "total_ms": (t_convert_in + t_transfer_in + t_kernel + t_transfer_out + t_convert_out) * 1000,
+    }
+    return results, timing
 
 
 # =====================================================================

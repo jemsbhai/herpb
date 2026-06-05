@@ -15,6 +15,7 @@ from herpb.gpu.batch_ops import (
     mpz_to_limbs,
     limbs_to_mpz,
     batch_mod_scalar_mul,
+    batch_mod_scalar_mul_timed,
     gpu_batch_plaintext_mul,
     LIMBS,
 )
@@ -167,9 +168,9 @@ class TestGPUPlaintextMul:
 
 class TestBenchmark:
 
-    @pytest.mark.parametrize("batch_size", [1000, 10000, 100000])
+    @pytest.mark.parametrize("batch_size", [1000, 10000, 100000, 1000000])
     def test_gpu_vs_cpu_benchmark(self, rsa_n, batch_size):
-        """Compare GPU batch vs CPU serial. Reports speedup."""
+        """Compare GPU batch vs CPU serial with timing breakdown."""
         As = [random_mpz_below(rsa_n, seed=700 + i) for i in range(batch_size)]
         scalars = [((i * 31) % 131072) - 65536 for i in range(batch_size)]
 
@@ -178,15 +179,17 @@ class TestBenchmark:
         cpu_results = [(As[i] * scalars[i]) % rsa_n for i in range(batch_size)]
         cpu_time = time.perf_counter() - t0
 
-        # GPU batch (includes data transfer)
-        t0 = time.perf_counter()
-        gpu_results = batch_mod_scalar_mul(As, scalars, rsa_n)
-        gpu_time = time.perf_counter() - t0
+        # GPU batch with timing breakdown
+        gpu_results, timing = batch_mod_scalar_mul_timed(As, scalars, rsa_n)
 
         # Verify correctness
         mismatches = sum(1 for i in range(batch_size) if gpu_results[i] != cpu_results[i])
         assert mismatches == 0, f"{mismatches}/{batch_size} mismatches"
 
-        speedup = cpu_time / gpu_time if gpu_time > 0 else float("inf")
-        print(f"\n  batch={batch_size}: CPU={cpu_time*1000:.1f}ms, "
-              f"GPU={gpu_time*1000:.1f}ms, speedup={speedup:.2f}x")
+        speedup = cpu_time * 1000 / timing['total_ms'] if timing['total_ms'] > 0 else float('inf')
+        print(f"\n  batch={batch_size}: CPU={cpu_time*1000:.1f}ms, GPU total={timing['total_ms']:.1f}ms, speedup={speedup:.2f}x")
+        print(f"    convert_in={timing['convert_in_ms']:.1f}ms  "
+              f"transfer_in={timing['transfer_in_ms']:.1f}ms  "
+              f"kernel={timing['kernel_ms']:.1f}ms  "
+              f"transfer_out={timing['transfer_out_ms']:.1f}ms  "
+              f"convert_out={timing['convert_out_ms']:.1f}ms")
