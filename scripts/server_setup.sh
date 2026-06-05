@@ -17,9 +17,22 @@ if [ ! -d "herpb" ]; then
     git clone https://github.com/jemsbhai/herpb.git
 fi
 cd herpb
-git pull origin main
+git pull
+
+# ── Upgrade pip/setuptools first (prevents UNKNOWN package bug) ──
+pip install --upgrade pip setuptools wheel --break-system-packages 2>/dev/null \
+    || pip install --upgrade pip setuptools wheel
 
 pip install -e . --break-system-packages 2>/dev/null || pip install -e .
+
+# Verify the package installed correctly
+PKG_NAME=$(pip show herpb 2>/dev/null | grep "^Name:" | awk '{print $2}')
+if [ "$PKG_NAME" != "herpb" ]; then
+    echo "WARNING: Package installed as '$PKG_NAME' instead of 'herpb'"
+    echo "Trying: pip install -e . --no-build-isolation"
+    pip install -e . --no-build-isolation --break-system-packages 2>/dev/null \
+        || pip install -e . --no-build-isolation
+fi
 
 # ── Core dependencies ──
 pip install numpy scipy matplotlib pyyaml tqdm --break-system-packages 2>/dev/null \
