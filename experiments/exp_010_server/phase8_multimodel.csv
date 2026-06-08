@@ -1,0 +1,7 @@
+r1,r5,r10,ndcg10,mean_ms,p50_ms,p95_ms,qps,dataset,model,n_docs,dim,scheme,n_queries
+1.0,1.0,1.0,1.0,3.258,3.249,3.499,306.91,synthetic_all-MiniLM-L6-v2,all-MiniLM-L6-v2,1000,384,qp,20
+1.0,1.0,1.0,1.0,5.642,5.06,8.904,177.25,synthetic_all-MiniLM-L6-v2,all-MiniLM-L6-v2,1000,384,mp,20
+1.0,1.0,1.0,1.0,4.349,4.272,5.009,229.92,synthetic_all-mpnet-base-v2,all-mpnet-base-v2,1000,768,qp,20
+1.0,1.0,1.0,1.0,9.219,8.954,11.115,108.47,synthetic_all-mpnet-base-v2,all-mpnet-base-v2,1000,768,mp,20
+1.0,1.0,1.0,1.0,5.628,5.631,5.908,177.68,synthetic_bge-large-en-v1.5,BAAI/bge-large-en-v1.5,1000,1024,qp,20
+1.0,1.0,1.0,1.0,11.786,11.725,12.345,84.85,synthetic_bge-large-en-v1.5,BAAI/bge-large-en-v1.5,1000,1024,mp,20

@@ -1,0 +1,2 @@
+r1,r5,r10,ndcg10,mean_ms,p50_ms,p95_ms,std_ms,qps,scheme,n_docs,dim
+1.0,1.0,1.0,1.0,9712.177,9688.028,9761.502,40.824,0.1,paillier,50,384
