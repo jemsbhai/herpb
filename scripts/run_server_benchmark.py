@@ -378,21 +378,70 @@ def run_phase6():
         log("  datasets not installed, skipping"); return
 
     model = load_sentence_model("all-MiniLM-L6-v2")
-    log("  Loading MS MARCO passages...")
-    ds = load_dataset("ms_marco", "v1.1", split="train", trust_remote_code=True)
 
+    # Try multiple MS MARCO sources in order of reliability
     passages, queries_text = [], []
-    for row in ds:
-        for p in row["passages"]["passage_text"]:
-            passages.append(p)
-            if len(passages) >= 6000:
-                break
-        if row["query"] and len(queries_text) < 100:
-            queries_text.append(row["query"])
-        if len(passages) >= 6000 and len(queries_text) >= 100:
-            break
+    dataset_used = None
 
-    log(f"  Collected {len(passages)} passages, {len(queries_text)} queries")
+    # Attempt 1: Standard ms_marco
+    try:
+        log("  Trying ms_marco v1.1...")
+        ds = load_dataset("ms_marco", "v1.1", split="train", trust_remote_code=True)
+        for row in ds:
+            for p in row["passages"]["passage_text"]:
+                passages.append(p)
+                if len(passages) >= 6000:
+                    break
+            if row["query"] and len(queries_text) < 100:
+                queries_text.append(row["query"])
+            if len(passages) >= 6000 and len(queries_text) >= 100:
+                break
+        if len(passages) >= 100:
+            dataset_used = "ms_marco_v1.1"
+    except Exception as e:
+        log(f"    Failed: {e}")
+
+    # Attempt 2: microsoft/ms_marco
+    if len(passages) < 100:
+        passages, queries_text = [], []
+        try:
+            log("  Trying microsoft/ms_marco...")
+            ds = load_dataset("microsoft/ms_marco", "v1.1", split="train", trust_remote_code=True)
+            for row in ds:
+                for p in row["passages"]["passage_text"]:
+                    passages.append(p)
+                    if len(passages) >= 6000:
+                        break
+                if row["query"] and len(queries_text) < 100:
+                    queries_text.append(row["query"])
+                if len(passages) >= 6000 and len(queries_text) >= 100:
+                    break
+            if len(passages) >= 100:
+                dataset_used = "microsoft/ms_marco"
+        except Exception as e:
+            log(f"    Failed: {e}")
+
+    # Attempt 3: Fallback to SQuAD (always available)
+    if len(passages) < 100:
+        passages, queries_text = [], []
+        try:
+            log("  Falling back to SQuAD...")
+            ds = load_dataset("squad", split="train", trust_remote_code=True)
+            for row in ds:
+                passages.append(row["context"])
+                queries_text.append(row["question"])
+                if len(passages) >= 6000:
+                    break
+            dataset_used = "squad"
+        except Exception as e:
+            log(f"    SQuAD also failed: {e}, skipping phase")
+            return
+
+    if len(passages) < 100 or len(queries_text) < 10:
+        log(f"  Not enough data ({len(passages)} passages, {len(queries_text)} queries), skipping")
+        return
+
+    log(f"  Dataset: {dataset_used} | {len(passages)} passages, {len(queries_text)} queries")
     doc_emb = model.encode(passages[:5000], batch_size=256, show_progress_bar=True,
                             normalize_embeddings=True).astype(np.float32)
     query_emb = model.encode(queries_text[:50], batch_size=64,
