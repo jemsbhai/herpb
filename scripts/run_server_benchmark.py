@@ -443,27 +443,54 @@ def run_phase7():
         log("  datasets not installed, skipping"); return
 
     model = load_sentence_model("all-MiniLM-L6-v2")
-    log("  Loading Natural Questions...")
-    ds = load_dataset("natural_questions", "default", split="train",
-                      trust_remote_code=True, streaming=True)
 
+    # Try multiple dataset sources in order of reliability
     passages, queries_text = [], []
-    for row in ds:
-        if row.get("document", {}).get("tokens", {}).get("token"):
-            text = " ".join(row["document"]["tokens"]["token"][:200])
-            passages.append(text)
-        if row.get("question", {}).get("text"):
-            queries_text.append(row["question"]["text"])
-        if len(passages) >= 10_000 and len(queries_text) >= 100:
-            break
+    dataset_used = None
 
+    # Attempt 1: NQ from sentence-transformers formatted version
+    try:
+        log("  Trying sentence-transformers/natural-questions...")
+        ds = load_dataset("sentence-transformers/natural-questions", split="train",
+                          trust_remote_code=True, streaming=True)
+        for row in ds:
+            if row.get("answer"):
+                passages.append(str(row["answer"]))
+            if row.get("query"):
+                queries_text.append(str(row["query"]))
+            if len(passages) >= 10_000 and len(queries_text) >= 100:
+                break
+        if len(passages) >= 100:
+            dataset_used = "sentence-transformers/natural-questions"
+    except Exception as e:
+        log(f"    Failed: {e}")
+
+    # Attempt 2: Use SQuAD as fallback (reliable, always available)
     if len(passages) < 100:
-        log("  Not enough passages loaded, skipping")
+        try:
+            log("  Falling back to SQuAD...")
+            ds = load_dataset("squad", split="train", trust_remote_code=True)
+            for row in ds:
+                passages.append(row["context"])
+                queries_text.append(row["question"])
+                if len(passages) >= 10_000:
+                    break
+            dataset_used = "squad"
+        except Exception as e:
+            log(f"    SQuAD also failed: {e}, skipping phase")
+            return
+
+    # Deduplicate passages
+    passages = list(dict.fromkeys(passages))
+    queries_text = list(dict.fromkeys(queries_text))
+
+    if len(passages) < 100 or len(queries_text) < 10:
+        log(f"  Not enough data ({len(passages)} passages, {len(queries_text)} queries), skipping")
         return
 
     n_passages = min(len(passages), 10_000)
     n_queries = min(len(queries_text), 50)
-    log(f"  Collected {n_passages} passages, {n_queries} queries")
+    log(f"  Dataset: {dataset_used} | {n_passages} passages, {n_queries} queries")
 
     doc_emb = model.encode(passages[:n_passages], batch_size=256,
                             show_progress_bar=True, normalize_embeddings=True).astype(np.float32)
@@ -475,7 +502,7 @@ def run_phase7():
     for n_docs in [1_000, 5_000, min(n_passages, 10_000)]:
         if n_docs > n_passages:
             continue
-        log(f"\n  NQ N = {n_docs}")
+        log(f"\n  {dataset_used} N = {n_docs}")
         docs = doc_emb[:n_docs]
         doc_ints = encode_matrix(docs, DEFAULT_K)
         queries_int = [[n for n, _ in encode_vector(query_emb[qi].tolist(), DEFAULT_K)]
@@ -486,7 +513,7 @@ def run_phase7():
 
         times, ranks = run_qp_benchmark(queries_int, doc_ints, n_docs, n_queries)
         m = compute_metrics(true_rankings, ranks, times)
-        m.update({"dataset": "natural_questions", "model": "all-MiniLM-L6-v2",
+        m.update({"dataset": dataset_used, "model": "all-MiniLM-L6-v2",
                   "n_docs": n_docs, "dim": dim, "scheme": "qp"})
         rows.append(m)
         log(f"    QP: {m['mean_ms']:.2f} ms, R@1={m['r1']:.3f}, nDCG@10={m['ndcg10']:.3f}")
@@ -822,8 +849,7 @@ def run_phase14():
     try:
         import cupy as cp
         from herpb.gpu.montgomery import (
-            MontgomeryContext, to_montgomery_batch,
-            from_montgomery_batch, montgomery_multiply_batch,
+            MontgomeryContext, batch_mod_mul_gpu,
         )
     except Exception as e:
         log(f"  GPU module not available ({e}), skipping"); return
@@ -847,13 +873,18 @@ def run_phase14():
         cpu_ms = (time.perf_counter() - t0) * 1000
 
         try:
-            a_m = to_montgomery_batch(a_vals, ctx)
-            b_m = to_montgomery_batch(b_vals, ctx)
+            # Warm-up
+            _ = batch_mod_mul_gpu(a_vals[:10], b_vals[:10], n, ctx)
             cp.cuda.Stream.null.synchronize()
+
             t0 = time.perf_counter()
-            c_m = montgomery_multiply_batch(a_m, b_m, ctx)
+            gpu_results = batch_mod_mul_gpu(a_vals, b_vals, n, ctx)
             cp.cuda.Stream.null.synchronize()
             gpu_ms = (time.perf_counter() - t0) * 1000
+
+            # Verify sample
+            for i in [0, batch // 2, batch - 1]:
+                assert gpu_results[i] == cpu_results[i], f"Mismatch at {i}"
 
             log(f"    CPU: {cpu_ms:.1f} ms | GPU: {gpu_ms:.2f} ms | {cpu_ms/gpu_ms:.1f}x")
             rows.append({"batch": batch, "cpu_ms": round(cpu_ms, 2),
